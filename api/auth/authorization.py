@@ -10,6 +10,7 @@ from auth.schemas import AccessToken
 from auth.password import verify_password
 from auth.models import User
 from conf import settings
+from db import get_session
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token', auto_error=False)
@@ -35,7 +36,8 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> A
         expires_at = datetime.now(timezone.utc) + expires_delta
     else:
         expires_at = datetime.now(timezone.utc) + access_token_expires
-    to_encode.update({'expires_at': expires_at.timestamp()})
+    expires_at_encoded = int(expires_at.timestamp())
+    to_encode.update({'expires_at': expires_at_encoded})
     encoded_jwt = jwt.encode(
         to_encode,
         key=settings.app_secret,
@@ -44,17 +46,22 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> A
     return AccessToken(
         token=encoded_jwt,
         token_type='Bearer',
-        expires_at=int(expires_at.timestamp()),
+        expires_at=expires_at_encoded,
     )
+
+
+def decode_token(token: str):
+    payload = jwt.decode(
+        token,
+        settings.app_secret,
+        algorithms=[settings.access_token_hash_algorithm],
+    )
+    return payload
 
 
 async def authenticate_token(token: str):
     try:
-        payload = jwt.decode(
-            token,
-            settings.app_secret,
-            algorithms=[settings.access_token_hash_algorithm],
-        )
+        payload = decode_token(token)
         expires_at = payload.get('expires_at')
         if not expires_at:
             raise CredentialValidationException('Could not validate token expiry')
@@ -65,7 +72,8 @@ async def authenticate_token(token: str):
             raise CredentialValidationException('Could not validate credentials')
     except InvalidTokenError:
         raise CredentialValidationException('Could not validate credentials')
-    user = User(id=int(user_id))
+    with get_session() as db_session:
+        user = db_session.get(User, user_id)
     if user is None:
         raise CredentialValidationException('Could not validate credentials')
     if not user.is_active:

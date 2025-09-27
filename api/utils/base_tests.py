@@ -17,9 +17,16 @@ class BaseTestCase(IsolatedAsyncioTestCase):
 
 
 class ApiTestClient(TestClient):
+    access_token = None
+
     def force_login(self, user: User):
         access_token = generate_user_access_token(user)
+        self.access_token = access_token
         self.headers['Authorization'] = f'{access_token.token_type} {access_token.token}'
+
+    def logout(self):
+        self.access_token = None
+        self.headers.pop('Authorization', None)
 
 
 class ApiTestCase(BaseTestCase):

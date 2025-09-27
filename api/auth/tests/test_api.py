@@ -1,3 +1,4 @@
+from unittest.mock import ANY
 from freezegun import freeze_time
 from sqlmodel import select
 
@@ -116,4 +117,111 @@ class RegistrationApiTestCase(ApiTestCase):
                 'token': access_token.token,
                 'token_type': access_token.token_type,
                 'expires_at': access_token.expires_at,
+            })
+
+
+class CurrentUserTestCase(ApiTestCase):
+    @property
+    def url(self):
+        return self.app.url_path_for('auth:current_user_api')
+
+    def test_get(self):
+        with self.subTest('should fail if not logged in'):
+            response = self.client.get(self.url)
+            self.assertEqual(response.status_code, 401)
+        self.client.force_login(self.user)
+        with self.subTest('should return info about current user and token'):
+            response = self.client.get(self.url)
+            response_data = response.json()
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response_data['user'], {
+                'id': self.user.id,
+                'name': self.user.name,
+                'email': self.user.email,
+            })
+            self.assertEqual(response_data['access_token'], {
+                'token': self.client.access_token.token,
+                'token_type': self.client.access_token.token_type,
+                'expires_at': self.client.access_token.expires_at,
+            })
+
+
+class LoginViewTestCase(ApiTestCase):
+    @property
+    def url(self):
+        return self.app.url_path_for('auth:login_api')
+
+    def test_post(self):
+        password = 'correct_password_123'
+        self.user.set_password(password)
+        self.client.force_login(self.user)
+        with self.subTest('should fail if logged in'):
+            response = self.client.post(self.url, json={
+                'email': self.user.email,
+                'password': password,
+            })
+            self.assertEqual(response.status_code, 403)
+        self.client.logout()
+        with self.subTest('should fail if no email'):
+            response = self.client.post(self.url, json={
+                'password': 'Qwe123!@',
+            })
+            self.assertEqual(response.status_code, 400)
+            self.assertDictEqual(
+                response.json(),
+                {
+                    'email': ['Field required'],
+                },
+            )
+        with self.subTest('should fail if no password'):
+            response = self.client.post(self.url, json={
+                'email': self.user.email,
+            })
+            self.assertEqual(response.status_code, 400)
+            self.assertDictEqual(
+                response.json(),
+                {
+                    'password': ['Field required'],
+                },
+            )
+        with self.subTest('should fail if incorrect email'):
+            response = self.client.post(self.url, json={
+                'email': 'incorrect-email@email.com',
+                'password': password,
+            })
+            self.assertEqual(response.status_code, 400)
+            self.assertDictEqual(
+                response.json(),
+                {
+                    '__all__': ['Incorrect email or password'],
+                },
+            )
+        with self.subTest('should fail if incorrect password'):
+            response = self.client.post(self.url, json={
+                'email': self.user.email,
+                'password': 'incorrect_password',
+            })
+            self.assertEqual(response.status_code, 400)
+            self.assertDictEqual(
+                response.json(),
+                {
+                    '__all__': ['Incorrect email or password'],
+                },
+            )
+        with self.subTest('should return user and token if password and email correct'):
+            response = self.client.post(self.url, json={
+                'email': self.user.email,
+                'password': password,
+            })
+            self.assertEqual(response.status_code, 200)
+            response_data = response.json()
+            self.assertEqual(response_data['user'], {
+                'id': self.user.id,
+                'name': self.user.name,
+                'email': self.user.email,
+            })
+            self.assertEqual(response_data['access_token'], {
+                'token': ANY,
+                'token_type': 'Bearer',
+                'expires_at': ANY,
             })

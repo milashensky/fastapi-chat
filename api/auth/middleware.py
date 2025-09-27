@@ -15,4 +15,5 @@ class SessionUserMiddleware:
         except CredentialValidationException:
             authenticated_user = None
         scope['user'] = authenticated_user
+        scope['token'] = token
         await self.app(scope, receive, send)

@@ -8,7 +8,7 @@ from db import get_session
 
 class AccessToken(BaseModel):
     token: str
-    token_type: str
+    token_type: str = 'Bearer'
     expires_at: int
 
 
@@ -39,3 +39,8 @@ class PublicUser(BaseModel):
 class LoginUserResponse(BaseModel):
     user: PublicUser
     access_token: AccessToken
+
+
+class LoginForm(BaseModel):
+    email: EmailStr
+    password: str = Field(min_length=6)

@@ -25,3 +25,13 @@ class User(SQLModel, table=True):
 
     def __eq__(self, other):
         return (self.id == other.id) and (self.updated_at == other.updated_at)
+
+    def set_password(self, password):
+        from auth.password import hash_password
+        from db import get_session
+
+        with get_session() as db_session:
+            local_object = db_session.merge(self)
+            local_object.password = hash_password(password)
+            db_session.add(local_object)
+            db_session.commit()

@@ -59,3 +59,10 @@ class SessionMiddlewareTestCase(IsolatedAsyncioTestCase):
             response = await self.request(token='123456')
             response_user_id = response.json()
             self.assertIsNone(response_user_id)
+        with self.subTest('should assign unauthorized user if no user matches session token'):
+            user = UserFactory.build()
+            user.id = 99999
+            token = generate_user_access_token(user)
+            response = await self.request(token=token.token)
+            response_user_id = response.json()
+            self.assertIsNone(response_user_id)

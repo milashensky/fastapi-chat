@@ -1,4 +1,5 @@
 from fastapi import HTTPException, status
+from fastapi import Request as BaseRequest
 from utils.request import Request
 
 
@@ -6,10 +7,15 @@ class BaseView:
     @classmethod
     def as_view(cls):
 
-        async def handle_request(request: Request):
+        async def handle_request(request: BaseRequest):
             view = cls()
-            view.request = request
-            return await view.dispatch(request=request)
+            wrapped_request = Request(
+                scope=request.scope,
+                receive=request._receive,
+                send=request._send,
+            )
+            view.request = wrapped_request
+            return await view.dispatch(request=wrapped_request)
 
         return handle_request
 
