@@ -225,3 +225,47 @@ class LoginViewTestCase(ApiTestCase):
                 'token_type': 'Bearer',
                 'expires_at': ANY,
             })
+
+
+class AccessTokenApiTestCase(ApiTestCase):
+    @property
+    def url(self):
+        return self.app.url_path_for('auth:access_token_api')
+
+    def test_get(self):
+        with self.subTest('should fail if not logged in'):
+            response = self.client.get(self.url)
+            self.assertEqual(response.status_code, 401)
+        with freeze_time('2025-10-10T12:00:00Z'):
+            self.client.force_login(self.user)
+        with (
+            self.subTest('should return current token'),
+            freeze_time('2025-10-10T12:20:00Z'),
+        ):
+            response = self.client.get(self.url)
+            self.assertEqual(response.status_code, 200)
+            self.assertDictEqual(
+                response.json(),
+                {
+                    'token': self.client.access_token.token,
+                    'token_type': 'Bearer',
+                    'expires_at': self.client.access_token.expires_at,
+                },
+            )
+
+    def test_post(self):
+        with self.subTest('should fail if not logged in'):
+            response = self.client.post(self.url)
+            self.assertEqual(response.status_code, 401)
+        with freeze_time('2025-10-10T12:00:00Z'):
+            self.client.force_login(self.user)
+        with (
+            self.subTest('should return refreshed token'),
+            freeze_time('2025-10-10T12:20:00Z'),
+        ):
+            response = self.client.post(self.url)
+            self.assertEqual(response.status_code, 200)
+            response_data = response.json()
+            self.assertNotEqual(response_data['token'], self.client.access_token.token)
+            # now + 30 min
+            self.assertEqual(response_data['expires_at'], 1760100600)
