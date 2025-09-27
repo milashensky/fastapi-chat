@@ -10,7 +10,7 @@ logger = logging.getLogger(__file__)
 
 os.environ['FASTAPI_SETTINGS_MODULE'] = 'test_settings'
 
-from main import get_settings  # noqa: E402
+from conf import get_settings  # noqa: E402
 
 settings = get_settings()
 

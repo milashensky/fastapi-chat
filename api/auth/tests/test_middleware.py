@@ -26,7 +26,7 @@ class SessionMiddlewareTestCase(IsolatedAsyncioTestCase):
 
     async def request(self, user=None, token=None):
         if not token and user:
-            token = generate_user_access_token(user)
+            token = generate_user_access_token(user).token
         headers = {
             'Authorization': f'Bearer {token}'
         }
@@ -52,7 +52,7 @@ class SessionMiddlewareTestCase(IsolatedAsyncioTestCase):
             self.subTest('should assign unauthorized user if session token in request headers is expired'),
             freeze_time('2025-12-10T12:00:00Z'),
         ):
-            response = await self.request(token=token)
+            response = await self.request(token=token.token)
             response_user_id = response.json()
             self.assertIsNone(response_user_id)
         with self.subTest('should assign unauthorized user if session token in request headers is invalid'):

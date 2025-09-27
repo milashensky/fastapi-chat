@@ -18,6 +18,7 @@ class User(SQLModel, table=True):
         default_factory=datetime.datetime.utcnow,
     )
     updated_at: Optional[datetime.datetime] = Field(
+        default=None,
         sa_column=Column(DateTime(), onupdate=func.now()),
     )
 

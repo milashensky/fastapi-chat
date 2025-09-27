@@ -1,23 +1,27 @@
-import importlib
-import os
-from functools import lru_cache
-
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 from auth.middleware import SessionUserMiddleware
 from auth.router import auth_router
-from settings import Settings
+from conf import settings
+from utils.serizalization import serialize_errors
 
-
-@lru_cache
-def get_settings() -> Settings:
-    settings_module_name = os.getenv('FASTAPI_SETTINGS_MODULE', 'settings')
-    settings_module = importlib.import_module(settings_module_name)
-    return settings_module.Settings()
-
-
-app = FastAPI()
+app = FastAPI(
+    debug=settings.debug,
+)
 
 app.add_middleware(SessionUserMiddleware)
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(
+    request: Request,
+    exc: RequestValidationError,
+):
+    return JSONResponse(
+        status_code=400,
+        content=jsonable_encoder(serialize_errors(exc)),
+    )
 
 app.include_router(auth_router, prefix='/api/auth')

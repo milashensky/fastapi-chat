@@ -7,6 +7,7 @@ from sqlalchemy import Pool
 
 class Settings(BaseSettings):
     app_name: str = 'FastAPI Chat'
+    debug: bool = True
     app_secret: str = 'add a strong secret to .env'
     base_dir: str | pathlib.Path = pathlib.Path(__file__).parent.resolve()
 
