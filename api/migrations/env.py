@@ -7,6 +7,7 @@ from alembic import context
 from sqlmodel import SQLModel
 
 from db import get_db_connection_dsn
+from auth.models import User  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
