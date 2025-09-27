@@ -14,8 +14,10 @@ class AuthInfoApi(BaseView):
 
 class CurrentUserApi(BaseView):
     async def get(self, request):
+        if not request.user:
+            raise HTTPException(status_code=401, detail='Not authorized')
         return {
-            'id': 1,
+            'id': request.user.id,
         }
 
 
@@ -24,5 +26,5 @@ class UserApi(BaseView):
         with get_session() as db_session:
             user = db_session.get(User, user_id)
         if not user:
-            raise HTTPException(status_code=404, detail="Hero not found")
+            raise HTTPException(status_code=404, detail='User not found')
         return user

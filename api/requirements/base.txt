@@ -5,3 +5,8 @@ PyJWT==2.10.1
 python-dotenv==1.1.1
 sqlmodel==0.0.25
 pydantic-settings==2.11.0
+passlib==1.7.4
+factory_boy==3.3.3
+SQLAlchemy==2.0.43
+SQLAlchemy-Utils==0.42.0
+freezegun==1.5.5

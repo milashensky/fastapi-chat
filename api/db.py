@@ -5,7 +5,7 @@ from sqlmodel import create_engine, Session
 
 
 
-def get_db_connection_str():
+def get_db_connection_dsn():
     from main import get_settings
 
     settings = get_settings()
@@ -14,8 +14,18 @@ def get_db_connection_str():
 
 @lru_cache
 def get_engine():
-    engine = create_engine(get_db_connection_str())
+    from main import get_settings
+
+    settings = get_settings()
+    engine = create_engine(
+        get_db_connection_dsn(),
+        poolclass=settings.db_pool_class,
+    )
     return engine
+
+
+def session_factory():
+    return Session(get_engine())
 
 
 @contextmanager

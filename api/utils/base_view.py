@@ -1,4 +1,5 @@
-from fastapi import HTTPException, Request, status
+from fastapi import HTTPException, status
+from utils.request import Request
 
 
 class BaseView:
