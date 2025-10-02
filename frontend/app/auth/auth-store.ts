@@ -1,40 +1,48 @@
 import { create } from "zustand";
 import type { AccessToken, LoginCredentials, User } from "./types";
 import axios from "axios";
+import { useUserStore } from "./user-store";
 
-export const useAuthStore = create((set) => ({
-    user: null as User | null,
-    accessToken: null as AccessToken | null,
-    login: async (credentials: LoginCredentials) => {
-        const response = await axios.post<{
-            user: User,
-            access_token: AccessToken,
-        }>('/api/auth/login', credentials)
+interface CurrentUserResponse {
+    user: User
+    access_token: AccessToken
+}
+
+export const useAuthStore = create((set) => {
+    const setCurrentUser = (responseData: CurrentUserResponse) => {
         const {
             user,
             access_token: accessToken,
-        } = response.data
+        } = responseData
         set(() => ({
-            user,
+            userId: user.id,
             accessToken,
         }))
-    },
-    logout: () => {
-        set(() => ({
-            user: null,
-            accessToken: null,
-        }))
-    },
-    refreshAccessToken: async () => {
-        const response = await axios.post<{
-            user: User,
-            access_token: AccessToken,
-        }>('/api/auth/token')
-        const {
-            access_token: accessToken,
-        } = response.data
-        set(() => ({
-            accessToken,
-        }))
-    },
-}))
+        const { storeUser } = useUserStore.getState()
+        storeUser(user.id, user)
+    }
+    return {
+        userId: null as User['id'] | null,
+        accessToken: null as AccessToken | null,
+        async login(credentials: LoginCredentials) {
+            const response = await axios.post<CurrentUserResponse>('/api/auth/login', credentials)
+            setCurrentUser(response.data)
+        },
+        logout() {
+            set(() => ({
+                userId: null,
+                accessToken: null,
+            }))
+        },
+        async refreshAccessToken() {
+            const response = await axios.post<AccessToken>('/api/auth/token')
+            set(() => ({
+                accessToken: response.data,
+            }))
+        },
+        async fetchCurrentUser() {
+            const response = await axios.get<CurrentUserResponse>('/api/auth/me')
+            setCurrentUser(response.data)
+        },
+    }
+})

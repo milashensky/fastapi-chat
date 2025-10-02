@@ -3,7 +3,9 @@ import { cleanup } from '@testing-library/react';
 import { vi, afterEach } from 'vitest';
 
 afterEach(() => {
-    cleanup();
+    cleanup()
+    vi.clearAllMocks()
+    vi.restoreAllMocks()
 });
 
 // Mock window.matchMedia for required components
@@ -19,4 +21,4 @@ Object.defineProperty(window, 'matchMedia', {
         removeEventListener: vi.fn(),
         dispatchEvent: vi.fn(),
     })),
-});
+})

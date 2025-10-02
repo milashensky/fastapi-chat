@@ -32,6 +32,11 @@ const getProxyHandler = <T, Key extends keyof T & string>(setter: (value: T) => 
     }
 })
 
+/**
+ * a helper to use reactive state the same isRef is used.
+ * helps to reduce boiler if state needs to be provided from a hook
+ * or easily change state if it's an object
+ */
 export const useStateRef = <T>(initialValue: T): StateRef<T> => {
     const [stateValue, setState] = useState<T>(initialValue)
     return new Proxy(
