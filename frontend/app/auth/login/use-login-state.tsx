@@ -1,4 +1,5 @@
-import { useStateRef, type MaybeRef } from "~/utils/stateRef"
+import { toValue, useStateRef, type MaybeRef } from "~/utils/stateRef"
+import { useAuthStore } from "../auth-store"
 
 export interface Options {
     email: MaybeRef<string>
@@ -17,13 +18,17 @@ export const useLoginState = (options: Options) => {
     })
     const actions = {
         validate(): boolean {
-            return false
+            return true
         },
         async submit() {
             const isValid = actions.validate()
             if (!isValid) {
                 return
             }
+            await useAuthStore.getState().login({
+                email: toValue(options.email),
+                password: toValue(options.password),
+            })
         },
         ...options.actions,
     }

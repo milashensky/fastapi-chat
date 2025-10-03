@@ -65,3 +65,10 @@ export const useStateRef = <T>(initialValue: T): StateRef<T> => {
         },
     )
 }
+
+export const toValue = <T>(maybeRef: MaybeRef<T>): T => {
+    if (typeof maybeRef === 'object' && Object.hasOwn((maybeRef as StateRef<T>), 'current')) {
+        return (maybeRef as StateRef<T>).current
+    }
+    return maybeRef as T
+}

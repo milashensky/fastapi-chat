@@ -6,9 +6,11 @@ import {
 } from "@react-router/dev/routes";
 
 export default [
-    index("routes/home.tsx"),
-    layout("./auth/layout.tsx", [
+    layout("./auth/unauthenticated-layout.tsx", [
         route("login", "./auth/login/login.tsx"),
         route("registration", "./auth/registration.tsx"),
     ]),
+    layout("./auth/auth-required-layout.tsx", [
+        index("routes/home.tsx"),
+    ])
 ] satisfies RouteConfig;

@@ -1,14 +1,29 @@
 import { render } from '@testing-library/react'
-import { describe } from "vitest";
+import { describe } from 'vitest'
+import * as reactRouter from 'react-router'
 
 export const describeComponent = (testName, callback) => describe(testName, () => {
-    vi.mock('react-router', () => ({
-        ...vi.importActual('react-router'),
-        useOutletContext: () => ({ language: 'en' })
-    }));
+    vi.mock('react-router', async (importOriginal) => {
+        const original = await importOriginal()
+        return {
+            ...original,
+            useOutletContext: () => ({ language: 'en' }),
+            useNavigate: () => vi.fn(),
+        }
+    })
 
     callback({
-        render: render,
+        render(component, ...args) {
+            return render(
+                (
+                    <reactRouter.Router location={window.location}>
+                        {component}
+                    </reactRouter.Router>
+                ),
+                ...args,
+            )
+        },
+        reactRouter,
     })
 
     afterEach(() => {

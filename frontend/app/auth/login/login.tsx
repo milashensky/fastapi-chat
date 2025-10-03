@@ -1,17 +1,27 @@
-import { NavLink } from "react-router";
-import Button from "~/ui-kit/button";
-import Input from "~/ui-kit/input";
-import { useStateRef } from "~/utils/stateRef";
+import { NavLink } from "react-router"
+import Button from "~/ui-kit/button"
+import Form from "~/ui-kit/form"
+import Input from "~/ui-kit/input"
+import { useStateRef } from "~/utils/stateRef"
+import { useLoginState } from "./use-login-state"
 
 export default () => {
     const email = useStateRef('')
     const password = useStateRef('')
+    const {
+        submit,
+    } = useLoginState({
+        email,
+        password,
+    })
     return (
         <div>
             <h2>
                 Login
             </h2>
-            <form>
+            <Form
+                onSubmit={submit}
+            >
                 <div>
                     <Input
                         label="Email"
@@ -30,10 +40,10 @@ export default () => {
                         onInput={(value) => password.current = value}
                     />
                 </div>
-                <Button>
+                <Button type="submit">
                     Login
                 </Button>
-            </form>
+            </Form>
             <NavLink to="/registration">
                 Registration
             </NavLink>

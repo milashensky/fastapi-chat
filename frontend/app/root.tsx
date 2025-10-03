@@ -7,8 +7,25 @@ import {
     ScrollRestoration,
 } from "react-router";
 
-import type { Route } from "./+types/root";
-import "./app.css";
+import { setupRequest } from "./utils/setupRequest"
+import type { Route } from "./+types/root"
+import "./app.css"
+import { useAuthStore } from "./auth/auth-store"
+
+export const clientLoader = async () => {
+    setupRequest()
+    try {
+        const response = await useAuthStore.getState().fetchCurrentUser()
+        return response
+    } catch (e) {
+        // user is not authorized, it's normal
+        return null
+    }
+}
+
+export function shouldRevalidate() {
+    return false
+}
 
 export const links: Route.LinksFunction = () => [
     { rel: "preconnect", href: "https://fonts.googleapis.com" },

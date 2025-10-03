@@ -58,7 +58,7 @@ describeStore('auth-store', ({ createStore }) => {
             const store = createStore(useAuthStore)
             await act(async () => {
                 useAuthStore.setState({
-                    userId: userFactory(),
+                    userId: 0,
                     accessToken: accessTokenFactory(),
                 })
                 await store.logout()
