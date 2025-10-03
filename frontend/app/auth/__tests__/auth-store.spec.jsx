@@ -1,7 +1,5 @@
 import { describe } from "vitest"
 import axios from 'axios'
-import { act } from '@testing-library/react'
-import { describeStore } from "~/test/unit/storeTest"
 import { userFactory } from "~/test/factories/user"
 import { accessTokenFactory } from "~/test/factories/accessToken"
 import { useAuthStore } from '../auth-store'
@@ -9,7 +7,7 @@ import { useUserStore } from "../user-store"
 
 vi.mock('axios')
 
-describeStore('auth-store', ({ createStore }) => {
+describe('auth-store', () => {
     describe('login', () => {
         const email = 'somebody-once@told.me'
         const password = 'the world is gonna roll me'
@@ -23,12 +21,10 @@ describeStore('auth-store', ({ createStore }) => {
                     access_token: accessToken,
                 },
             })
-            const store = createStore(useAuthStore)
-            await act(async () => {
-                await store.login({
-                    email,
-                    password,
-                })
+            const store = useAuthStore.getState()
+            await store.login({
+                email,
+                password,
             })
             expect(axios.post).toHaveBeenCalledWith(
                 '/api/auth/login', {
@@ -44,25 +40,23 @@ describeStore('auth-store', ({ createStore }) => {
         it('should raise if failed', async() => {
             const error = 'testError'
             axios.post.mockRejectedValue(error)
-            const store = createStore(useAuthStore)
-            const promise = act(async () => store.login({
+            const store = useAuthStore.getState()
+            const promise = store.login({
                 email,
                 password,
-            }))
+            })
             await expect(promise).rejects.toThrow(error)
         })
     })
 
     describe('logout', () => {
         it('should reset access token and user', async () => {
-            const store = createStore(useAuthStore)
-            await act(async () => {
-                useAuthStore.setState({
-                    userId: 0,
-                    accessToken: accessTokenFactory(),
-                })
-                await store.logout()
+            const store = useAuthStore.getState()
+            useAuthStore.setState({
+                userId: 0,
+                accessToken: accessTokenFactory(),
             })
+            await store.logout()
             expect(useAuthStore.getState().accessToken).toStrictEqual(null)
             expect(useAuthStore.getState().userId).toStrictEqual(null)
         })
@@ -70,17 +64,15 @@ describeStore('auth-store', ({ createStore }) => {
 
     describe('refreshAccessToken', () => {
         it('should send post request and refresh current token', async () => {
-            const store = createStore(useAuthStore)
+            const store = useAuthStore.getState()
             const refreshedToken = accessTokenFactory()
             axios.post.mockResolvedValue({
                 data: refreshedToken,
             })
-            await act(async () => {
-                useAuthStore.setState({
-                    accessToken: accessTokenFactory(),
-                })
-                await store.refreshAccessToken()
+            useAuthStore.setState({
+                accessToken: accessTokenFactory(),
             })
+            await store.refreshAccessToken()
             expect(axios.post).toHaveBeenCalledWith('/api/auth/token')
             expect(useAuthStore.getState().accessToken).toStrictEqual(refreshedToken)
         })
@@ -96,10 +88,8 @@ describeStore('auth-store', ({ createStore }) => {
                     access_token: accessToken,
                 },
             })
-            const store = createStore(useAuthStore)
-            await act(async () => {
-                await store.fetchCurrentUser()
-            })
+            const store = useAuthStore.getState()
+            await store.fetchCurrentUser()
             expect(axios.get).toHaveBeenCalledWith('/api/auth/me')
             expect(useAuthStore.getState().accessToken).toStrictEqual(accessToken)
             expect(useAuthStore.getState().userId).toStrictEqual(user.id)
