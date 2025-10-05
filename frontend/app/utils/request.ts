@@ -1,5 +1,18 @@
-import axios from "axios"
+import axios, { type AxiosResponse } from "axios"
 import { useAuthStore } from "~/auth/auth-store"
+
+export type ResponseErrors = unknown
+
+export class BadResponseError extends Error {
+    response: AxiosResponse
+    errors: ResponseErrors | null = null
+
+    constructor(response: AxiosResponse) {
+        super()
+        this.response = response
+        this.errors = response.data
+    }
+}
 
 export const setupRequest = () => {
     axios.interceptors.request.use((config) => {
@@ -16,8 +29,12 @@ export const setupRequest = () => {
                 return Promise.reject(error)
             }
             const statusCode = error.response.status;
-            if (statusCode === 401) {
-                useAuthStore.getState().logout()
+            switch (statusCode) {
+                case 400:
+                    throw new BadResponseError(error.response)
+                case 401:
+                    useAuthStore.getState().logout()
+                    break
             }
             return Promise.reject(error)
         }

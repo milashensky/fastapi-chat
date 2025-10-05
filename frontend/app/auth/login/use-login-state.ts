@@ -1,5 +1,6 @@
 import { toValue, useStateRef, type MaybeRef } from "~/utils/stateRef"
 import { useAuthStore } from "../auth-store"
+import { BadResponseError } from "~/utils/request"
 
 export interface Options {
     email: MaybeRef<string>
@@ -10,12 +11,15 @@ export interface Options {
     }
 }
 
+export interface Errors {
+    __all__: string[]
+    email: string[]
+    password: string[]
+}
+
 export const useLoginState = (options: Options) => {
     const isPending = useStateRef(false)
-    const errors = useStateRef({
-        password: [] as string[],
-        email: [] as string[],
-    })
+    const errors = useStateRef<Partial<Errors>>({})
     const actions = {
         validate(): boolean {
             return true
@@ -25,10 +29,20 @@ export const useLoginState = (options: Options) => {
             if (!isValid) {
                 return
             }
-            await useAuthStore.getState().login({
-                email: toValue(options.email),
-                password: toValue(options.password),
-            })
+            isPending.current = true
+            try {
+                await useAuthStore.getState().login({
+                    email: toValue(options.email),
+                    password: toValue(options.password),
+                })
+                errors.current = {}
+            } catch (e) {
+                if (e instanceof BadResponseError) {
+                    errors.current = e.errors as Errors
+                }
+            } finally {
+                isPending.current = false
+            }
         },
         ...options.actions,
     }

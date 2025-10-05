@@ -16,9 +16,9 @@ export const describeComponent = (testName, callback) => describe(testName, () =
         render(component, ...args) {
             return render(
                 (
-                    <reactRouter.Router location={window.location}>
+                    <reactRouter.MemoryRouter location={window.location}>
                         {component}
-                    </reactRouter.Router>
+                    </reactRouter.MemoryRouter>
                 ),
                 ...args,
             )

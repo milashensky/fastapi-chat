@@ -1,3 +1,5 @@
+import ErrorList from '~/ui-kit/error-list'
+
 interface Props {
     value?: string
     label?: string
@@ -5,6 +7,7 @@ interface Props {
     disabled?: boolean
     rows?: number
     cols?: number
+    errors?: string[]
     onInput?: (value: string) => void
 }
 
@@ -26,6 +29,7 @@ export default (props: Props) => {
                 cols={props.cols}
                 onInput={handleInput}
             />
+            <ErrorList errors={props.errors} />
         </label>
     )
 }
