@@ -1,5 +1,10 @@
 import { create } from "zustand";
-import type { AccessToken, LoginCredentials, User } from "./types";
+import type {
+    AccessToken,
+    LoginCredentials,
+    RegistrationForm,
+    User,
+} from "./types";
 import axios from "axios";
 import { useUserStore } from "./user-store";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -16,6 +21,7 @@ interface AuthStore {
     logout: () => void
     refreshAccessToken: () => Promise<void>
     fetchCurrentUser: () => Promise<void>
+    registerUser: (userData: RegistrationForm) => Promise<void>
 }
 
 export const useAuthStore = create(
@@ -54,6 +60,10 @@ export const useAuthStore = create(
                 },
                 async fetchCurrentUser() {
                     const response = await axios.get<CurrentUserResponse>('/api/auth/me')
+                    setCurrentUser(response.data)
+                },
+                async registerUser(userData: RegistrationForm) {
+                    const response = await axios.post<CurrentUserResponse>('/api/auth/registration', userData)
                     setCurrentUser(response.data)
                 },
             }

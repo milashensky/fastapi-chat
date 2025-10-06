@@ -19,6 +19,8 @@ export const getMinLengthValidator = (minLength: number) => (value?: string): tr
     return true
 }
 
+export const passwordLengthValidator = getMinLengthValidator(6)
+
 export const emailValidator = (value?: string): true | string => {
     if (!value) {
         return true

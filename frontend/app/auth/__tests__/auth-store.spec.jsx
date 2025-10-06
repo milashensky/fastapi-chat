@@ -49,6 +49,39 @@ describe('auth-store', () => {
         })
     })
 
+    describe('registerUser', () => {
+        const name = 'shrek'
+        const email = 'somebody-once@told.me'
+        const password = 'the world is gonna roll me'
+
+        it('should make correct request and set user and token', async() => {
+            const user = userFactory()
+            const accessToken = accessTokenFactory()
+            axios.post.mockResolvedValue({
+                data: {
+                    user,
+                    access_token: accessToken,
+                },
+            })
+            const store = useAuthStore.getState()
+            await store.registerUser({
+                email,
+                name,
+                password,
+            })
+            expect(axios.post).toHaveBeenCalledWith(
+                '/api/auth/registration', {
+                    email,
+                    name,
+                    password,
+                },
+            )
+            expect(useAuthStore.getState().accessToken).toStrictEqual(accessToken)
+            expect(useAuthStore.getState().userId).toStrictEqual(user.id)
+            expect(useUserStore.getState().users[user.id]).toStrictEqual(user)
+        })
+    })
+
     describe('logout', () => {
         it('should reset access token and user', async () => {
             const store = useAuthStore.getState()

@@ -27,7 +27,7 @@ describeComponent('UnauthenticatedLayout', ({ render, reactRouter }) => {
 
     it('should support next query param', async () => {
         const next = '/somebody/once/told/me'
-        const url = new URL(`http://localhost/?next=${next}`);
+        const url = new URL(`http://localhost/?next=${next}`)
          Object.defineProperty(window, "location", {
             writable: true,
             value: {

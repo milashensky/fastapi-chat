@@ -1,6 +1,8 @@
-import { toValue, useStateRef, type MaybeRef } from "~/utils/stateRef"
-import { useAuthStore } from "../auth-store"
+import { useAuthStore } from "~/auth/auth-store"
+import type { FormErrors } from "~/globals/types"
+import type { LoginCredentials } from "~/auth/types"
 import { BadResponseError } from "~/utils/request"
+import { toValue, useStateRef, type MaybeRef } from "~/utils/stateRef"
 
 export interface Options {
     email: MaybeRef<string>
@@ -11,15 +13,11 @@ export interface Options {
     }
 }
 
-export interface Errors {
-    __all__: string[]
-    email: string[]
-    password: string[]
-}
+type Errors = FormErrors<LoginCredentials>
 
 export const useLoginState = (options: Options) => {
     const isPending = useStateRef(false)
-    const errors = useStateRef<Partial<Errors>>({})
+    const errors = useStateRef<Errors>({})
     const actions = {
         validate(): boolean {
             return true

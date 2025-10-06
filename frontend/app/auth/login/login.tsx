@@ -8,12 +8,10 @@ import Card from "~/ui-kit/card"
 import { useStateRef } from "~/utils/stateRef"
 import {
     emailValidator,
-    getMinLengthValidator,
+    passwordLengthValidator,
     requiredFieldValidator,
 } from "~/utils/validators"
 import { useLoginState } from "./use-login-state"
-
-const passwordLengthValidator = getMinLengthValidator(6)
 
 export default () => {
     const email = useStateRef('')
@@ -35,58 +33,56 @@ export default () => {
         },
     })
     return (
-        <div className="flex grow-1 items-center justify-center">
-            <Card
-                maxWidth={340}
-                className="flex flex-col items-center"
+        <Card
+            maxWidth={360}
+            className="flex flex-col items-center m-2 w-full"
+        >
+            <h2>
+                Login
+            </h2>
+            <Form
+                onSubmit={submit}
+                ref={formRef}
+                className="flex flex-col gap-4"
             >
-                <h2>
+                <ErrorList
+                    errors={errors.current.__all__}
+                />
+                <Input
+                    name="email"
+                    label="Email"
+                    placeholder="Enter email"
+                    disabled={isPending.current}
+                    type="email"
+                    value={email.current}
+                    rules={[requiredFieldValidator, emailValidator]}
+                    errors={errors.current.email}
+                    onInput={(value) => email.current = value}
+                />
+                <Input
+                    name="password"
+                    label="Password"
+                    placeholder="Enter password"
+                    disabled={isPending.current}
+                    type="password"
+                    value={password.current}
+                    rules={[requiredFieldValidator, passwordLengthValidator]}
+                    errors={errors.current.password}
+                    onInput={(value) => password.current = value}
+                />
+                <Button
+                    type="submit"
+                    disabled={isPending.current}
+                >
                     Login
-                </h2>
-                <Form
-                    onSubmit={submit}
-                    ref={formRef}
-                    className="flex flex-col gap-4"
-                >
-                    <ErrorList
-                        errors={errors.current.__all__}
-                    />
-                    <Input
-                        name="email"
-                        label="Email"
-                        placeholder="Enter email"
-                        disabled={isPending.current}
-                        type="email"
-                        value={email.current}
-                        rules={[requiredFieldValidator, emailValidator]}
-                        errors={errors.current.email}
-                        onInput={(value) => email.current = value}
-                    />
-                    <Input
-                        name="password"
-                        label="Password"
-                        placeholder="Enter password"
-                        disabled={isPending.current}
-                        type="password"
-                        value={password.current}
-                        rules={[requiredFieldValidator, passwordLengthValidator]}
-                        errors={errors.current.password}
-                        onInput={(value) => password.current = value}
-                    />
-                    <Button
-                        type="submit"
-                        disabled={isPending.current}
-                    >
-                        Login
-                    </Button>
-                </Form>
-                <NavLink
-                    to="/registration"
-                    className="p-1 mt-1"
-                >
-                    Registration
-                </NavLink>
-            </Card>
-        </div>
+                </Button>
+            </Form>
+            <NavLink
+                to="/registration"
+                className="p-1 mt-1"
+            >
+                Registration
+            </NavLink>
+        </Card>
     )
 }

@@ -14,7 +14,11 @@ const Layout = () => {
             navigate(nextRoute, { replace: true })
         }
     }, [userId])
-    return <Outlet />
+    return (
+        <div className="flex grow-1 items-center justify-center">
+            <Outlet />
+        </div>
+    )
 }
 
 export default Layout
