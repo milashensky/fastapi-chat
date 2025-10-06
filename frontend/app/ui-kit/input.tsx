@@ -1,4 +1,5 @@
 import ErrorList from '~/ui-kit/error-list'
+import { useFormValidator, type FieldValidator } from './form'
 
 interface Props <T = string>{
     value?: T
@@ -7,6 +8,7 @@ interface Props <T = string>{
     placeholder?: string
     disabled?: boolean
     type?: string
+    rules?: FieldValidator<T>[]
     onInput?: (value: T) => void
 }
 
@@ -17,6 +19,16 @@ export default (props: Props) => {
         }
         props.onInput(e.currentTarget.value)
     }
+    const {
+        errors,
+    } = useFormValidator({
+        value: props.value,
+        rules: props.rules,
+    })
+    const allErrors = [
+        ...errors.current,
+        ...props.errors ?? [],
+    ]
     return (
         <label>
             { props.label }
@@ -27,7 +39,7 @@ export default (props: Props) => {
                 type={props.type}
                 onInput={handleInput}
             />
-            <ErrorList errors={props.errors} />
+            <ErrorList errors={allErrors} />
         </label>
     )
 }
