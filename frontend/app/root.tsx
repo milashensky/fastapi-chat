@@ -9,8 +9,8 @@ import {
 
 import { setupRequest } from "./utils/request"
 import type { Route } from "./+types/root"
-import "./app.css"
 import { useAuthStore } from "./auth/auth-store"
+import "~/styles/main.css"
 
 export const clientLoader = async () => {
     setupRequest()

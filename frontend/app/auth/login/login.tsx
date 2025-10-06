@@ -1,16 +1,17 @@
+import { useRef } from "react"
 import { NavLink } from "react-router"
 import ErrorList from '~/ui-kit/error-list'
 import Button from "~/ui-kit/button"
 import Form, { type FormRef } from "~/ui-kit/form"
 import Input from "~/ui-kit/input"
+import Card from "~/ui-kit/card"
 import { useStateRef } from "~/utils/stateRef"
-import { useLoginState } from "./use-login-state"
 import {
     emailValidator,
     getMinLengthValidator,
     requiredFieldValidator,
 } from "~/utils/validators"
-import { useRef } from "react"
+import { useLoginState } from "./use-login-state"
 
 const passwordLengthValidator = getMinLengthValidator(6)
 
@@ -34,20 +35,24 @@ export default () => {
         },
     })
     return (
-        <div>
-            <h2>
-                Login
-            </h2>
-            <Form
-                onSubmit={submit}
-                ref={formRef}
+        <div className="flex grow-1 items-center justify-center">
+            <Card
+                maxWidth={340}
+                className="flex flex-col items-center"
             >
-                <ErrorList
-                    errors={errors.current.__all__}
-                />
-                <div>
+                <h2>
+                    Login
+                </h2>
+                <Form
+                    onSubmit={submit}
+                    ref={formRef}
+                    className="flex flex-col gap-4"
+                >
+                    <ErrorList
+                        errors={errors.current.__all__}
+                    />
                     <Input
-                        data-testid="email"
+                        name="email"
                         label="Email"
                         placeholder="Enter email"
                         disabled={isPending.current}
@@ -57,10 +62,8 @@ export default () => {
                         errors={errors.current.email}
                         onInput={(value) => email.current = value}
                     />
-                </div>
-                <div>
                     <Input
-                        data-testid="password"
+                        name="password"
                         label="Password"
                         placeholder="Enter password"
                         disabled={isPending.current}
@@ -70,17 +73,20 @@ export default () => {
                         errors={errors.current.password}
                         onInput={(value) => password.current = value}
                     />
-                </div>
-                <Button
-                    type="submit"
-                    disabled={isPending.current}
+                    <Button
+                        type="submit"
+                        disabled={isPending.current}
+                    >
+                        Login
+                    </Button>
+                </Form>
+                <NavLink
+                    to="/registration"
+                    className="p-1 mt-1"
                 >
-                    Login
-                </Button>
-            </Form>
-            <NavLink to="/registration">
-                Registration
-            </NavLink>
+                    Registration
+                </NavLink>
+            </Card>
         </div>
     )
 }

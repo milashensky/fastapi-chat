@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@theme {
+    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
+        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+html,
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+
+    @apply bg-white dark:bg-gray-950;
+
+    @media (prefers-color-scheme: dark) {
+        color-scheme: dark;
+    }
+}
+
+
+@import './variables.scss';
+@import './typography.scss';
+@import '~/ui-kit/styles/input.scss';
+@import '~/ui-kit/styles/button.scss';
+@import '~/ui-kit/styles/card.scss';

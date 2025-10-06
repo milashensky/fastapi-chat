@@ -16,6 +16,7 @@ export interface FormRef {
 interface Props {
     onSubmit?: () => void
     children: React.ReactNode
+    className?: string
     ref?: React.Ref<FormRef>
 }
 
@@ -89,6 +90,7 @@ export default (props: Props) => {
     }
     return (
         <form
+            className={props.className}
             onSubmit={handleSubmit}
         >
             <FormContext.Provider

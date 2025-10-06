@@ -16,7 +16,10 @@ const ErrorList = (props: Props) => {
     }
     return getErrorsDisplay().map((error, index) =>
         (
-            <p key={index}>
+            <p
+                key={index}
+                role="error message"
+            >
                 { error }
             </p>
         )

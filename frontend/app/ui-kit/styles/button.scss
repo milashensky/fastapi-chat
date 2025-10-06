@@ -1,0 +1,50 @@
+@layer components {
+    button {
+        --button-color: var(--color-primary);
+
+        background-color: var(--button-color);
+        border: 1px solid var(--button-color);
+        border-radius: var(--radius-md);
+        color: var(--color-white);
+        padding: 4px 12px;
+        position: relative;
+
+        &:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0;
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+
+            &:after {
+                background-color: var(--text-color);
+                opacity: 0.2;
+            }
+        }
+
+        &:not(:disabled) {
+            cursor: pointer;
+
+            &:hover:after {
+                background-color: var(--button-color);
+                opacity: 0.2;
+            }
+
+
+            &:active:after {
+                background-color: var(--text-color);
+                opacity: 0.1;
+            }
+
+            &:focus {
+                outline: solid var(--button-color);
+            }
+        }
+    }
+}

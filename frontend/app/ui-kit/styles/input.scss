@@ -1,0 +1,28 @@
+@layer components {
+    input[type="number"],
+    input[type="date"],
+    input[type="email"],
+    input[type="password"],
+    input[type="search"],
+    input[type="text"] {
+        padding: 4px 8px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        color: var(--text-color);
+        cursor: pointer;
+
+        &:disabled {
+            background-color: var(--disabled-color);
+            cursor: not-allowed;
+        }
+
+        label > & {
+            display: block;
+            width: 100%;
+
+            &[aria-invalid="true"] {
+                border-color: var(--error-border-color);
+            }
+        }
+    }
+}
