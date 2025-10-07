@@ -36,7 +36,7 @@ class RoomRoleFactory(ModelFactory):
 
 
 class RoomInviteFactory(ModelFactory):
-    chat_room_id = factory.SubFactory(ChatRoomFactory)
+    chat_room = factory.SubFactory(ChatRoomFactory)
     created_by = factory.SubFactory('auth.tests.factories.UserFactory')
     created_by_id = factory.SelfAttribute('created_by.id')
 

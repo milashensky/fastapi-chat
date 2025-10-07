@@ -1,10 +1,13 @@
+import datetime
 from typing import Annotated, List
+import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 
 from auth.authorization import get_current_user
-from chat.models import ChatRoom, RoomRole, RoomRoleEnum
-from chat.schemas import ChatRoomUpdate, CreateRoomBody, PublicChatRoom
+from chat.models import ChatRoom, RoomInvite, RoomRole, RoomRoleEnum
+from chat.schemas import ChatRoomUpdate, CreateRoomBody, PublicChatInvite, PublicChatRoom
+from conf import settings
 from db import SessionDep
 
 
@@ -79,14 +82,14 @@ def get_user_chat_room_with_access(
         current_user: Annotated[list, Depends(get_current_user)],
         db_session: SessionDep,
     ):
-        statement = (
+        role_query = (
             select(RoomRole)
             .where(
                 RoomRole.user_id == current_user.id,
                 RoomRole.chat_room_id == room_id,
             )
         )
-        room_role = db_session.exec(statement).scalar_one_or_none()
+        room_role = db_session.exec(role_query).scalar_one_or_none()
         if not room_role:
             raise HTTPException(404, 'Not Found')
         # allow access if not set
@@ -124,5 +127,62 @@ async def delete_chat_room_api(
     return None
 
 
-async def list_room_messages_api():
-    pass
+@chat_router.post('/rooms/{room_id}/invite', name='chat:create_invite_api', response_model=PublicChatInvite, status_code=200)
+async def create_invite_api(
+    current_user: Annotated[list, Depends(get_current_user)],
+    room: Annotated[ChatRoom, Depends(get_user_chat_room_with_access([RoomRoleEnum.ADMIN, RoomRoleEnum.MODERATOR]))],
+    db_session: SessionDep,
+):
+    now = datetime.datetime.now(datetime.timezone.utc)
+    max_expiry = now + datetime.timedelta(minutes=settings.max_invite_reuse_before_expiry_min)
+    valid_invite_query = select(RoomInvite).where(
+        RoomInvite.chat_room_id == room.id,
+        RoomInvite.expires_at > max_expiry,
+    )
+    valid_invite = db_session.exec(valid_invite_query).scalar_one_or_none()
+    if valid_invite:
+        return valid_invite
+    new_invite = RoomInvite(
+        created_by_id=current_user.id,
+        chat_room_id=room.id,
+    )
+    db_session.add(new_invite)
+    db_session.commit()
+    return new_invite
+
+
+@chat_router.get('/room-invite/{invite_id}', name='chat:accept_invite_api', response_model=PublicChatRoom, status_code=201)
+async def accept_invite_api(
+    invite_id: uuid.UUID,
+    current_user: Annotated[list, Depends(get_current_user)],
+    db_session: SessionDep,
+):
+    now = datetime.datetime.now()
+    invite_query = select(RoomInvite).where(
+        RoomInvite.id == invite_id,
+    )
+    invite = db_session.exec(invite_query).scalar_one_or_none()
+    if not invite:
+        raise HTTPException(404, 'Not Found')
+    if invite.expires_at < now:
+        raise HTTPException(410, 'Invite is expired')
+    chat_room = invite.chat_room
+    role_query = (
+        select(RoomRole)
+        .where(
+            RoomRole.user_id == current_user.id,
+            RoomRole.chat_room_id == chat_room.id,
+        )
+    )
+    room_role = db_session.exec(role_query).scalar_one_or_none()
+    if room_role:
+        raise HTTPException(412, 'Already in the room')
+    new_role = RoomInvite(
+        created_by_id=current_user.id,
+        chat_room_id=chat_room.id,
+        invite_id=invite_id,
+    )
+    db_session.add(new_role)
+    db_session.commit()
+    db_session.refresh(chat_room)
+    return chat_room

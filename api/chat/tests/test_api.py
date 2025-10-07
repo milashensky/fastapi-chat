@@ -1,11 +1,22 @@
 from unittest import skip
-from sqlmodel import select
+from sqlmodel import delete, select
 from sqlalchemy.orm import selectinload
 
 from auth.tests.factories import UserFactory
-from chat.models import ChatRoom, Message, RoomRole, RoomRoleEnum
+from chat.models import (
+    ChatRoom,
+    Message,
+    RoomInvite,
+    RoomRole,
+    RoomRoleEnum,
+)
 from chat.tests.base import ChatApiTestCase
-from chat.tests.factories import ChatRoomFactory, MessageFactory, RoomRoleFactory
+from chat.tests.factories import (
+    ChatRoomFactory,
+    MessageFactory,
+    RoomRoleFactory,
+    RoomInviteFactory,
+)
 
 
 def serialize_role(role):
@@ -284,30 +295,117 @@ class RoomRoleApiTestCase(ChatApiTestCase):
             self.fail()
 
 
-@skip('not implemented')
 class ChatInviteApiTestCase(ChatApiTestCase):
     def get_url(self, pk=None):
         if not pk:
-            return self.app.url_path_for('chat:create_invite_api')
-        return self.app.url_path_for('chat:chat_invite_api', invite_id=pk)
+            return self.app.url_path_for('chat:create_invite_api', room_id=self.chat_room.id)
+        return self.app.url_path_for('chat:accept_invite_api', invite_id=pk)
 
     def test_get(self):
-        self.skipTest
+        invite = RoomInviteFactory()
+        chat_room = invite.chat_room
+        url = self.get_url(invite.id)
         with self.subTest('should require auth'):
-            self.fail()
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 401)
+        self.client.force_login(self.user)
         with self.subTest('should add a user to chat'):
-            self.fail()
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 201)
+            role = self.db_session.exec(
+                select(RoomRole)
+                .where(
+                    RoomRole.chat_room_id == self.chat_room.id,
+                    RoomRole.user_id == self.user.id
+                )
+            ).first()
+            self.assertIsNotNone(role)
+            self.assertDictEqual(
+                response.json(),
+                serialize_room(chat_room),
+            )
+        invite = RoomInviteFactory(chat_room=self.chat_room)
+        url = self.get_url(invite.id)
         with self.subTest('should not add a user already has role'):
-            self.fail()
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 412)
+        invite = RoomInviteFactory(
+            expires_at='2024-12-12T12:30:00',
+        )
+        url = self.get_url(invite.id)
         with self.subTest('should not work past expiry'):
-            self.fail()
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 410)
 
     def test_create(self):
+        url = self.get_url()
         with self.subTest('should require auth'):
-            self.fail()
-        with self.subTest('should not allow to delete a role without rights'):
-            self.fail()
+            response = self.client.post(url)
+            self.assertEqual(response.status_code, 401)
+        self.client.force_login(self.user)
+        self.room_role.role = RoomRoleEnum.USER
+        self.db_session.add(self.room_role)
+        self.db_session.commit()
+        with self.subTest('should not allow to create invite without rights'):
+            response = self.client.post(url)
+            self.assertEqual(response.status_code, 403)
+        self.room_role.role = RoomRoleEnum.MODERATOR
+        self.db_session.add(self.room_role)
+        self.db_session.exec(delete(RoomInvite).where(RoomInvite.chat_room_id == self.chat_room.id))
+        self.db_session.commit()
+        # expired_invite
+        RoomInviteFactory(
+            chat_room=self.chat_room,
+            expires_at='2024-12-12T12:30:00',
+        )
+        # valid, but different room
+        RoomInviteFactory()
         with self.subTest('should allow to create invite to mod'):
-            self.fail()
+            response = self.client.post(url)
+            self.assertEqual(response.status_code, 200)
+            invite = self.db_session.exec(
+                select(RoomInvite)
+                .where(
+                    RoomInvite.chat_room_id == self.chat_room.id,
+                    RoomInvite.expires_at > '2025-01-01',
+                )
+            ).first()
+            self.assertIsNotNone(invite)
+            self.assertDictEqual(
+                response.json(),
+                {
+                    'id': str(invite.id),
+                },
+            )
+        self.room_role.role = RoomRoleEnum.ADMIN
+        self.db_session.add(self.room_role)
+        self.db_session.exec(delete(RoomInvite).where(RoomInvite.chat_room_id == self.chat_room.id))
+        self.db_session.commit()
         with self.subTest('should allow to create invite to admin'):
-            self.fail()
+            response = self.client.post(url)
+            self.assertEqual(response.status_code, 200)
+            invite = self.db_session.exec(
+                select(RoomInvite)
+                .where(
+                    RoomInvite.chat_room_id == self.chat_room.id,
+                )
+            ).first()
+            self.assertIsNotNone(invite)
+            self.assertDictEqual(
+                response.json(),
+                {
+                    'id': str(invite.id),
+                },
+            )
+        self.db_session.exec(delete(RoomInvite).where(RoomInvite.chat_room_id == self.chat_room.id))
+        self.db_session.commit()
+        invite = RoomInviteFactory(chat_room=self.chat_room)
+        with self.subTest('should return existing valid invite if exists'):
+            response = self.client.post(url)
+            self.assertEqual(response.status_code, 200)
+            self.assertDictEqual(
+                response.json(),
+                {
+                    'id': str(invite.id),
+                },
+            )

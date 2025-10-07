@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 30
 
     chat_invite_valid_hours: int = 24
+    max_invite_reuse_before_expiry_min: int = 10
 
     db_engine: str = 'postgresql'
     db_host: str = 'localhost'

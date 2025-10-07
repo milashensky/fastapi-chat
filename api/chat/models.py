@@ -3,7 +3,7 @@ import enum
 from typing import TYPE_CHECKING, Optional
 import uuid
 from sqlalchemy import Column, DateTime, func
-from sqlmodel import Enum, Field, SQLModel, Relationship
+from sqlmodel import Enum, Field, SQLModel, Relationship, UniqueConstraint
 
 from conf import settings
 
@@ -33,6 +33,10 @@ class ChatRoom(SQLModel, table=True):
         cascade_delete=True,
     )
     roles: list['RoomRole'] = Relationship(
+        back_populates='chat_room',
+        cascade_delete=True,
+    )
+    invites: list['RoomInvite'] = Relationship(
         back_populates='chat_room',
         cascade_delete=True,
     )
@@ -99,6 +103,7 @@ class RoomInvite(SQLModel, table=True):
         foreign_key='chat_room.id',
         ondelete="CASCADE",
     )
+    chat_room: ChatRoom = Relationship(back_populates='invites')
     expires_at: datetime.datetime = Field(
         default_factory=get_expires_at,
     )
@@ -112,6 +117,10 @@ class RoomInvite(SQLModel, table=True):
 
 
 class RoomRole(SQLModel, table=True):
+    __table_args__ = (
+        UniqueConstraint('chat_room_id', 'user_id', name='unique_user_in_room'),
+    )
+
     id: int | None = Field(default=None, primary_key=True)
     chat_room_id: int | None = Field(
         default=None,
