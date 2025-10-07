@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     access_token_hash_algorithm: str = 'HS256'
     access_token_expire_minutes: int = 30
 
+    chat_invite_valid_hours: int = 24
+
     db_engine: str = 'postgresql'
     db_host: str = 'localhost'
     db_port: str = '5432'

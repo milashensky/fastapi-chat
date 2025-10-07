@@ -1,8 +1,11 @@
 import datetime
-from typing import Optional
+from typing import TYPE_CHECKING, Optional, List
 from pydantic import EmailStr
 from sqlalchemy import Column, DateTime, UniqueConstraint, func
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, Relationship, SQLModel
+
+if TYPE_CHECKING:
+    from chat.models import RoomRole
 
 
 class User(SQLModel, table=True):
@@ -21,6 +24,10 @@ class User(SQLModel, table=True):
     updated_at: Optional[datetime.datetime] = Field(
         default=None,
         sa_column=Column(DateTime(), onupdate=func.now()),
+    )
+    roles: List['RoomRole'] = Relationship(
+        back_populates='user',
+        cascade_delete=True,
     )
 
     def __eq__(self, other):

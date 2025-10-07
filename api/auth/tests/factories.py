@@ -1,5 +1,4 @@
 import factory
-from db import session_factory
 from auth.models import User
 from utils.base_factories import ModelFactory
 
@@ -12,5 +11,3 @@ class UserFactory(ModelFactory):
 
     class Meta:
         model = User
-        sqlalchemy_session_factory = session_factory
-        sqlalchemy_session_persistence = 'commit'

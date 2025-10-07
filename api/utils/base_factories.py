@@ -1,4 +1,6 @@
 import factory
+from db import session_factory
+
 
 class ModelFactory(factory.alchemy.SQLAlchemyModelFactory):
     @classmethod
@@ -8,3 +10,7 @@ class ModelFactory(factory.alchemy.SQLAlchemyModelFactory):
         obj = super()._save(model_class, session, args, kwargs)
         session.refresh(obj)
         return obj
+
+    class Meta:
+        sqlalchemy_session_factory = session_factory
+        sqlalchemy_session_persistence = 'commit'

@@ -1,6 +1,8 @@
 from contextlib import contextmanager
 from functools import lru_cache
+from typing import Annotated
 
+from fastapi import Depends
 from sqlmodel import create_engine, Session
 
 from conf import settings
@@ -19,6 +21,7 @@ def get_engine():
     return engine
 
 
+@lru_cache
 def session_factory():
     return Session(get_engine())
 
@@ -27,3 +30,11 @@ def session_factory():
 def get_session():
     with Session(get_engine()) as session:
         yield session
+
+
+def get_dep_session():
+    with Session(get_engine()) as session:
+        yield session
+
+
+SessionDep = Annotated[Session, Depends(get_dep_session)]

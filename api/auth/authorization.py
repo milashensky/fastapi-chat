@@ -88,10 +88,9 @@ def generate_user_access_token(user: User) -> AccessToken:
     return access_token
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
-    try:
-        user = authenticate_token(token)
-    except CredentialValidationException:
+def get_current_user(request: Request):
+    user = request.scope.get('user')
+    if not user or (user.id is None):
         raise HTTPException(status_code=401)
     return user
 

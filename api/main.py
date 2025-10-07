@@ -5,8 +5,9 @@ from fastapi.responses import JSONResponse
 
 from auth.middleware import SessionUserMiddleware
 from auth.router import auth_router
+from chat.api import chat_router
 from conf import settings
-from utils.serizalization import serialize_errors
+from utils.serialization import serialize_errors
 from utils.exceptions import ValidationError
 
 app = FastAPI(
@@ -39,3 +40,4 @@ async def validation_error_handler(
 
 
 app.include_router(auth_router, prefix='/api/auth')
+app.include_router(chat_router, prefix='/api/chat')
