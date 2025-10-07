@@ -1,3 +1,4 @@
+from collections import namedtuple
 import datetime
 from typing import Annotated, List
 import uuid
@@ -6,6 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import desc, select
 
 from auth.authorization import get_current_user
+from auth.models import User
 from chat.models import (
     ChatRoom,
     Message,
@@ -21,8 +23,10 @@ from chat.schemas import (
     MessageUpdateBody,
     MessagesList,
     PublicChatInvite,
+    PublicRoomRole,
     PublicChatRoom,
     PublicMessage,
+    RoomRoleUpdateBody,
 )
 from conf import settings
 from db import SessionDep
@@ -43,7 +47,7 @@ def patch_model(model, data, db_session):
 
 
 def get_user_chat_rooms(
-    current_user: Annotated[list, Depends(get_current_user)],
+    current_user: Annotated[User, Depends(get_current_user)],
     db_session: SessionDep,
 ):
     statement = select(ChatRoom).join(RoomRole).where(RoomRole.user_id == current_user.id)
@@ -59,7 +63,7 @@ async def chat_room_list_api(rooms: Annotated[list, Depends(get_user_chat_rooms)
 @chat_router.post('/rooms', name='chat:create_room_api', response_model=PublicChatRoom, status_code=201)
 async def create_chat_room_api(
     room_data: CreateRoomBody,
-    current_user: Annotated[list, Depends(get_current_user)],
+    current_user: Annotated[User, Depends(get_current_user)],
     db_session: SessionDep,
 ):
     new_room = ChatRoom.model_validate(room_data)
@@ -78,7 +82,7 @@ async def create_chat_room_api(
 
 def get_user_chat_room(
     room_id: int,
-    current_user: Annotated[list, Depends(get_current_user)],
+    current_user: Annotated[User, Depends(get_current_user)],
     db_session: SessionDep,
 ):
     statement = (
@@ -107,7 +111,7 @@ def get_user_chat_room_with_access(
 ):
     def handler(
         room_id: int,
-        current_user: Annotated[list, Depends(get_current_user)],
+        current_user: Annotated[User, Depends(get_current_user)],
         db_session: SessionDep,
     ):
         role_query = (
@@ -151,7 +155,7 @@ async def delete_chat_room_api(
 
 @chat_router.post('/rooms/{room_id}/invite', name='chat:create_invite_api', response_model=PublicChatInvite, status_code=200)
 async def create_invite_api(
-    current_user: Annotated[list, Depends(get_current_user)],
+    current_user: Annotated[User, Depends(get_current_user)],
     room: Annotated[ChatRoom, Depends(get_user_chat_room_with_access([RoomRoleEnum.ADMIN, RoomRoleEnum.MODERATOR]))],
     db_session: SessionDep,
 ):
@@ -176,7 +180,7 @@ async def create_invite_api(
 @chat_router.get('/room-invite/{invite_id}', name='chat:accept_invite_api', response_model=PublicChatRoom, status_code=201)
 async def accept_invite_api(
     invite_id: uuid.UUID,
-    current_user: Annotated[list, Depends(get_current_user)],
+    current_user: Annotated[User, Depends(get_current_user)],
     db_session: SessionDep,
 ):
     now = datetime.datetime.now()
@@ -213,7 +217,7 @@ async def accept_invite_api(
 @chat_router.post('/room/{room_id}/message', name='chat:create_message_api', response_model=PublicMessage, status_code=201)
 async def create_message_api(
     data: CreateMessageBody,
-    current_user: Annotated[list, Depends(get_current_user)],
+    current_user: Annotated[User, Depends(get_current_user)],
     room: Annotated[ChatRoom, Depends(get_user_chat_room)],
     db_session: SessionDep,
 ):
@@ -257,7 +261,7 @@ async def list_messages_api(
 @chat_router.patch('/message/{message_id}', name='chat:update_message_api', response_model=PublicMessage)
 async def update_message_api(
     data: MessageUpdateBody,
-    current_user: Annotated[list, Depends(get_current_user)],
+    current_user: Annotated[User, Depends(get_current_user)],
     message_id,
     db_session: SessionDep,
 ):
@@ -276,7 +280,7 @@ async def update_message_api(
 
 @chat_router.delete('/message/{message_id}', name='chat:delete_message_api', response_model=None, status_code=204)
 async def delete_message_api(
-    current_user: Annotated[list, Depends(get_current_user)],
+    current_user: Annotated[User, Depends(get_current_user)],
     message_id,
     db_session: SessionDep,
 ):
@@ -301,5 +305,67 @@ async def delete_message_api(
         if not chat_role:
             raise HTTPException(404, 'Not Found')
     db_session.delete(message)
+    db_session.commit()
+    return None
+
+
+RolePair = namedtuple('RolePair', ['room_role', 'current_user_role'])
+
+
+def get_room_role(
+    role_id: int,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db_session: SessionDep,
+):
+    role_query = (
+        select(RoomRole)
+        .where(
+            RoomRole.id == role_id,
+        )
+    )
+    room_role = db_session.exec(role_query).first()
+    if not room_role:
+        raise HTTPException(404, 'Not Found')
+    user_room_role = db_session.exec(
+        select(RoomRole)
+        .where(
+            RoomRole.user_id == current_user.id,
+            RoomRole.chat_room_id == room_role.chat_room_id,
+        ),
+    ).first()
+    if not user_room_role:
+        raise HTTPException(404, 'Not Found')
+    return RolePair(room_role, user_room_role)
+
+
+@chat_router.get('/room-role/{role_id}', name='chat:get_room_role_api', response_model=PublicRoomRole)
+async def get_room_role_api(
+    role_pair: Annotated[RolePair, Depends(get_room_role)],
+):
+    return role_pair.room_role
+
+
+@chat_router.patch('/room-role/{role_id}', name='chat:update_room_role_api', response_model=PublicRoomRole)
+async def update_room_role_api(
+    data: RoomRoleUpdateBody,
+    role_pair: Annotated[RolePair, Depends(get_room_role)],
+    db_session: SessionDep,
+):
+    if role_pair.current_user_role.role is not RoomRoleEnum.ADMIN:
+        raise HTTPException(403, 'Not enough permissions to perform the action')
+    return patch_model(role_pair.room_role, data, db_session)
+
+
+@chat_router.delete('/room-role/{role_id}', name='chat:delete_room_role_api', response_model=None, status_code=204)
+async def delete_room_role_api(
+    role_pair: Annotated[RolePair, Depends(get_room_role)],
+    db_session: SessionDep,
+):
+    if (
+        (role_pair.current_user_role != role_pair.room_role)
+        and (role_pair.current_user_role.role not in [RoomRoleEnum.ADMIN, RoomRoleEnum.MODERATOR])
+    ):
+        raise HTTPException(403, 'Not enough permissions to perform the action')
+    db_session.delete(role_pair.room_role)
     db_session.commit()
     return None

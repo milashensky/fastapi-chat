@@ -8,14 +8,20 @@ from pydantic import (
 )
 from pydantic_partial import create_partial_model
 
+from chat.models import RoomRoleEnum
 
-class PublicChatRole(BaseModel):
+
+class PublicRoomRole(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
     user_id: int
     chat_room_id: int
-    role: str
+    role: RoomRoleEnum
+
+
+class RoomRoleUpdateBody(BaseModel):
+    role: Optional[RoomRoleEnum] = None
 
 
 class PublicChatRoom(BaseModel):
@@ -23,7 +29,7 @@ class PublicChatRoom(BaseModel):
 
     id: int
     name: str
-    roles: List[PublicChatRole]
+    roles: List[PublicRoomRole]
 
 
 class CreateRoomBody(BaseModel):

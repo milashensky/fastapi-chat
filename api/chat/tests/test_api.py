@@ -1,4 +1,3 @@
-from unittest import skip
 from unittest.mock import ANY
 from freezegun import freeze_time
 from sqlmodel import delete, select
@@ -460,40 +459,120 @@ class MessagesApiTestCase(ChatApiTestCase):
             ).first()
 
 
-@skip('not implemented')
 class RoomRoleApiTestCase(ChatApiTestCase):
     def get_url(self, pk):
-        return self.app.url_path_for('chat:update_room_role_api', role_id=pk)
+        return self.app.url_path_for('chat:get_room_role_api', role_id=pk)
 
     def test_get(self):
+        url = self.get_url(self.room_role.id)
         with self.subTest('should require auth'):
-            self.fail()
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 401)
+        user = UserFactory()
+        self.client.force_login(user)
         with self.subTest('should should require room access'):
-            self.fail()
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 404)
+        self.client.force_login(self.user)
         with self.subTest('should return room role'):
-            self.fail()
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            self.assertDictEqual(
+                response.json(),
+                serialize_role(self.room_role),
+            )
 
     def test_update(self):
+        body = {
+            'role': RoomRoleEnum.MODERATOR.value,
+        }
+        room_role = RoomRoleFactory(
+            chat_room=self.chat_room,
+        )
+        role_id = room_role.id
+        url = self.get_url(role_id)
         with self.subTest('should require auth'):
-            self.fail()
+            response = self.client.patch(url, json=body)
+            self.assertEqual(response.status_code, 401)
+        self.client.force_login(self.user)
+        self.room_role.role = RoomRoleEnum.MODERATOR
+        self.db_session.add(self.room_role)
+        self.db_session.commit()
         with self.subTest('should should require admin'):
-            self.fail()
+            response = self.client.patch(url, json=body)
+            self.assertEqual(response.status_code, 403)
+        self.room_role.role = RoomRoleEnum.ADMIN
+        self.db_session.add(self.room_role)
+        self.db_session.commit()
         with self.subTest('should allow to edit role'):
-            self.fail()
+            response = self.client.patch(url, json=body)
+            self.assertEqual(response.status_code, 200)
+            self.db_session.refresh(room_role)
+            self.assertEqual(room_role.role, body['role'])
+            self.assertDictEqual(
+                response.json(),
+                serialize_role(room_role),
+            )
+        role_user = room_role.user
+        body = {
+            'chat_room_id': -1,
+            'user_id': -1,
+        }
         with self.subTest('should not edit other fields'):
-            self.fail()
+            response = self.client.patch(url, json=body)
+            self.assertEqual(response.status_code, 200)
+            self.db_session.refresh(room_role)
+            self.assertEqual(room_role.user, role_user)
+            self.assertEqual(room_role.chat_room, self.chat_room)
 
     def test_delete(self):
+        room_role = RoomRoleFactory(
+            chat_room=self.chat_room,
+        )
+        role_id = room_role.id
+        url = self.get_url(role_id)
         with self.subTest('should require auth'):
-            self.fail()
+            response = self.client.delete(url)
+            self.assertEqual(response.status_code, 401)
+        another_role = RoomRoleFactory(
+            chat_room=self.chat_room,
+        )
+        self.client.force_login(another_role.user)
         with self.subTest('should not allow to delete a role without rights'):
-            self.fail()
+            response = self.client.delete(url)
+            self.assertEqual(response.status_code, 403)
+            room_role = self.db_session.exec(select(RoomRole).where(RoomRole.id == role_id)).first()
+            self.assertIsNotNone(room_role)
+        self.client.force_login(room_role.user)
         with self.subTest('should allow delete role to owner'):
-            self.fail()
-        with self.subTest('should allow delete role to mod'):
-            self.fail()
+            response = self.client.delete(url)
+            self.assertEqual(response.status_code, 204)
+            room_role = self.db_session.exec(select(RoomRole).where(RoomRole.id == role_id)).first()
+            self.assertIsNone(room_role)
+        self.client.force_login(self.user)
+        room_role = RoomRoleFactory(
+            chat_room=self.chat_room,
+        )
+        role_id = room_role.id
+        url = self.get_url(role_id)
         with self.subTest('should allow delete role to admin'):
-            self.fail()
+            response = self.client.delete(url)
+            self.assertEqual(response.status_code, 204)
+            room_role = self.db_session.exec(select(RoomRole).where(RoomRole.id == role_id)).first()
+            self.assertIsNone(room_role)
+        self.room_role.role = RoomRoleEnum.MODERATOR
+        self.db_session.add(self.room_role)
+        self.db_session.commit()
+        room_role = RoomRoleFactory(
+            chat_room=self.chat_room,
+        )
+        role_id = room_role.id
+        url = self.get_url(role_id)
+        with self.subTest('should allow delete role to mod'):
+            response = self.client.delete(url)
+            self.assertEqual(response.status_code, 204)
+            room_role = self.db_session.exec(select(RoomRole).where(RoomRole.id == role_id)).first()
+            self.assertIsNone(room_role)
 
 
 class ChatInviteApiTestCase(ChatApiTestCase):
