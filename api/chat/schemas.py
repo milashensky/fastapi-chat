@@ -1,6 +1,7 @@
+import datetime
 from typing import List, Optional
 import uuid
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class PublicChatRole(BaseModel):
@@ -21,14 +22,38 @@ class PublicChatRoom(BaseModel):
 
 
 class CreateRoomBody(BaseModel):
-    name: str
+    name: str = Field(min_length=3)
 
 
 class ChatRoomUpdate(BaseModel):
-    name: Optional[str] = None
+    name: Optional[str] = Field(default=None, min_length=3)
 
 
 class PublicChatInvite(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID
+
+
+class PublicMessage(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    content: str
+    type: str
+    chat_room_id: int
+    created_by_id: Optional[int]
+    created_at: datetime.datetime
+    updated_at: Optional[datetime.datetime]
+
+
+class CreateMessageBody(BaseModel):
+    content: str = Field(min_length=1)
+
+
+class MessagesList(BaseModel):
+    total: int
+    page: int
+    page_size: int
+    results: List[PublicMessage]
+    next: Optional[int]

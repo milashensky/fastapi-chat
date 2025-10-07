@@ -1,4 +1,6 @@
 from unittest import skip
+from unittest.mock import ANY
+from freezegun import freeze_time
 from sqlmodel import delete, select
 from sqlalchemy.orm import selectinload
 
@@ -17,6 +19,7 @@ from chat.tests.factories import (
     RoomRoleFactory,
     RoomInviteFactory,
 )
+from utils.test_matchers import AnyOrderedArray
 
 
 def serialize_role(role):
@@ -216,26 +219,135 @@ class ChatRoomsApiTestCase(ChatApiTestCase):
             self.assertEqual(self.room_role.user_id, self.user.id)
 
 
-@skip('not implemented')
+def serialize_message(message):
+    return {
+        'id': message.id,
+        'content': message.content,
+        'type': message.type.value,
+        'chat_room_id': message.chat_room_id,
+        'created_by_id': message.created_by_id,
+        'created_at': message.created_at.isoformat(),
+        'updated_at': ANY,
+    }
+
+
 class MessagesApiTestCase(ChatApiTestCase):
+    maxDiff = None
+
     def get_url(self, pk=None, room_id=None):
         room_id = room_id or self.chat_room.id
         if pk is None:
-            return self.app.url_path_for('chat:messages_list_api', room_id=room_id)
+            return self.app.url_path_for('chat:list_messages_api', room_id=room_id)
         return self.app.url_path_for('chat:update_message_api', message_id=pk)
 
     def test_list(self):
+        url = self.get_url()
         with self.subTest('should require auth'):
-            self.fail()
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 401)
+        user = UserFactory()
+        self.client.force_login(user)
         with self.subTest('should require some room access'):
-            self.fail()
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 404)
+        self.client.force_login(self.user)
+        with freeze_time('2024-12-12T12:30:00'):
+            messages1 = MessageFactory.create_batch(
+                size=3,
+                chat_room=self.chat_room,
+                content='ping ping ping pong',
+            )
+        with freeze_time('2025-01-12T12:30:00'):
+            messages2 = MessageFactory.create_batch(
+                size=3,
+                chat_room=self.chat_room,
+            )
+        with freeze_time('2025-02-12T12:30:00'):
+            messages3 = MessageFactory.create_batch(
+                size=3,
+                chat_room=self.chat_room,
+            )
+        messages = messages1 + messages2 + messages3
         with self.subTest('should return room messages'):
-            self.fail()
+            response = self.client.get(url)
+            response_data = response.json()
+            self.assertEqual(response.status_code, 200, response_data)
+            self.assertCountEqual
+            self.assertDictEqual(
+                response_data,
+                {
+                    'total': 9,
+                    'page': 1,
+                    'page_size': ANY,
+                    'next': None,
+                    # order is important, but to drop factory order
+                    # so we test it later
+                    'results': AnyOrderedArray([
+                        serialize_message(message)
+                        for message in messages
+                    ]),
+                },
+            )
         with self.subTest('should support pagination'):
-            self.fail()
+            response = self.client.get(f'{url}?page=2&page_size=3')
+            response_data = response.json()
+            self.assertEqual(response.status_code, 200, response_data)
+            self.assertDictEqual(
+                response_data,
+                {
+                    'total': 9,
+                    'page': 2,
+                    'page_size': 3,
+                    'next': 3,
+                    # also tests the order, since second batch is clearly created after first
+                    'results': AnyOrderedArray([
+                        serialize_message(message)
+                        for message in messages2
+                    ]),
+                },
+            )
         with self.subTest('should support search'):
-            self.fail()
+            response = self.client.get(f'{url}?search=ping PonG')
+            response_data = response.json()
+            self.assertEqual(response.status_code, 200, response_data)
+            self.assertDictEqual(
+                response_data,
+                {
+                    'total': 3,
+                    'page': 1,
+                    'page_size': ANY,
+                    'next': None,
+                    'results': AnyOrderedArray([
+                        serialize_message(message)
+                        for message in messages1
+                    ]),
+                },
+            )
 
+    def test_create(self):
+        url = self.get_url()
+        body = {
+            'content': 'somebody once told me',
+        }
+        with self.subTest('should require auth'):
+            response = self.client.post(url, json=body)
+            self.assertEqual(response.status_code, 401)
+        user = UserFactory()
+        self.client.force_login(user)
+        with self.subTest('should require some room access'):
+            response = self.client.post(url, json=body)
+            self.assertEqual(response.status_code, 404)
+        self.client.force_login(self.user)
+        with self.subTest('should require content'):
+            response = self.client.post(url, json={
+                'content': '',
+            })
+            self.assertEqual(response.status_code, 400)
+        with self.subTest('should create room message'):
+            response = self.client.post(url, json=body)
+            self.assertEqual(response.status_code, 201)
+
+    @skip('not implemented')
     def test_update(self):
         with self.subTest('should require auth'):
             self.fail()
@@ -246,6 +358,7 @@ class MessagesApiTestCase(ChatApiTestCase):
         with self.subTest('should not edit other fields'):
             self.fail()
 
+    @skip('not implemented')
     def test_delete(self):
         with self.subTest('should require auth'):
             self.fail()

@@ -3,12 +3,29 @@ from typing import Annotated, List
 import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
+from sqlmodel import desc
 
 from auth.authorization import get_current_user
-from chat.models import ChatRoom, RoomInvite, RoomRole, RoomRoleEnum
-from chat.schemas import ChatRoomUpdate, CreateRoomBody, PublicChatInvite, PublicChatRoom
+from chat.models import (
+    ChatRoom,
+    Message,
+    MessageTypeEnum,
+    RoomInvite,
+    RoomRole,
+    RoomRoleEnum,
+)
+from chat.schemas import (
+    ChatRoomUpdate,
+    CreateMessageBody,
+    CreateRoomBody,
+    MessagesList,
+    PublicChatInvite,
+    PublicChatRoom,
+    PublicMessage,
+)
 from conf import settings
 from db import SessionDep
+from utils.pagination import paginate_response, pagination_dep
 
 
 chat_router = APIRouter()
@@ -186,3 +203,47 @@ async def accept_invite_api(
     db_session.commit()
     db_session.refresh(chat_room)
     return chat_room
+
+
+@chat_router.post('/room/{room_id}/message', name='chat:create_message_api', response_model=PublicMessage, status_code=201)
+async def create_message_api(
+    data: CreateMessageBody,
+    current_user: Annotated[list, Depends(get_current_user)],
+    room: Annotated[ChatRoom, Depends(get_user_chat_room)],
+    db_session: SessionDep,
+):
+    message = Message(
+        chat_room=room,
+        created_by_id=current_user.id,
+        content=data.content
+    )
+    db_session.add(message)
+    db_session.commit()
+    db_session.refresh(message)
+    return message
+
+
+@chat_router.get('/room/{room_id}/message', name='chat:list_messages_api', response_model=MessagesList, status_code=200)
+async def list_messages_api(
+    pagination: Annotated[dict, Depends(pagination_dep)],
+    room: Annotated[ChatRoom, Depends(get_user_chat_room)],
+    db_session: SessionDep,
+    search: str | None = None,
+):
+    messages_query = (
+        select(Message)
+        .where(
+            Message.chat_room_id == room.id,
+        )
+        .order_by(desc(Message.created_at))
+    )
+    if search:
+        messages_query = messages_query.where(
+            Message.type == MessageTypeEnum.TEXT,
+            Message.content.ilike(f'%{search}%'),
+        )
+    return paginate_response(
+        messages_query,
+        pagination=pagination,
+        db_session=db_session,
+    )
