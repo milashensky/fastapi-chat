@@ -26,7 +26,7 @@ def paginate_response(
             query
             .offset(offset)
             .limit(page_size)
-        ).scalars().all()
+        ).all()
         has_next = (offset + page_size) < total
         if has_next:
             next_page = page + 1

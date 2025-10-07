@@ -10,3 +10,4 @@ factory_boy==3.3.3
 SQLAlchemy==2.0.43
 SQLAlchemy-Utils==0.42.0
 freezegun==1.5.5
+pydantic-partial==0.10.1

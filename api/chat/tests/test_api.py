@@ -8,6 +8,7 @@ from auth.tests.factories import UserFactory
 from chat.models import (
     ChatRoom,
     Message,
+    MessageTypeEnum,
     RoomInvite,
     RoomRole,
     RoomRoleEnum,
@@ -347,29 +348,116 @@ class MessagesApiTestCase(ChatApiTestCase):
             response = self.client.post(url, json=body)
             self.assertEqual(response.status_code, 201)
 
-    @skip('not implemented')
     def test_update(self):
+        body = {
+            'content': 'the world is gonna roll me',
+        }
+        message = MessageFactory(
+            chat_room=self.chat_room,
+            created_by_id=self.user.id,
+        )
+        message_id = message.id
+        url = self.get_url(message_id)
         with self.subTest('should require auth'):
-            self.fail()
+            response = self.client.patch(url, json=body)
+            self.assertEqual(response.status_code, 401)
+        role = RoomRoleFactory(
+            chat_room=self.chat_room,
+            role=RoomRoleEnum.ADMIN,
+        )
+        self.client.force_login(role.user)
         with self.subTest('should only allow to edit message to creator'):
-            self.fail()
+            response = self.client.patch(url, json=body)
+            self.assertEqual(response.status_code, 404)
+        self.client.force_login(self.user)
         with self.subTest('should should edit message content'):
-            self.fail()
+            response = self.client.patch(url, json=body)
+            response_data = response.json()
+            self.assertEqual(response.status_code, 200, response_data)
+            self.db_session.refresh(message)
+            self.assertEqual(message.content, body['content'])
+            self.assertDictEqual(
+                response_data,
+                serialize_message(message),
+            )
+        body = {
+            'id': -1,
+            'created_by_id': role.user_id,
+            'chat_room_id': 999,
+            'type': MessageTypeEnum.SYSTEM_ANNOUNCEMENT.value,
+            'created_at': '2024-12-12T12:30:00',
+        }
         with self.subTest('should not edit other fields'):
-            self.fail()
+            response = self.client.patch(url, json=body)
+            response_data = response.json()
+            self.assertEqual(response.status_code, 200, response_data)
+            self.db_session.refresh(message)
+            self.assertEqual(message.id, message_id)
+            self.assertEqual(message.chat_room_id, self.chat_room.id)
+            self.assertEqual(message.created_by_id, self.user.id)
+            self.assertEqual(message.type, MessageTypeEnum.TEXT)
+            self.assertDictEqual(
+                response_data,
+                serialize_message(message),
+            )
 
-    @skip('not implemented')
     def test_delete(self):
+        message = MessageFactory(
+            chat_room=self.chat_room,
+            created_by_id=self.user.id,
+        )
+        message_id = message.id
+        url = self.get_url(message_id)
         with self.subTest('should require auth'):
-            self.fail()
-        with self.subTest('should not allow to delete a message without rights'):
-            self.fail()
+            response = self.client.delete(url)
+            self.assertEqual(response.status_code, 401)
+        self.room_role.role = RoomRoleEnum.USER
+        self.db_session.add(self.room_role)
+        self.db_session.commit()
+        self.client.force_login(self.user)
         with self.subTest('should allow delete message to creator'):
-            self.fail()
+            response = self.client.delete(url)
+            self.assertEqual(response.status_code, 204)
+            message = self.db_session.exec(
+                select(Message).where(Message.id == message_id),
+            ).first()
+            self.assertIsNone(message)
+        message = MessageFactory(
+            chat_room=self.chat_room,
+        )
+        message_id = message.id
+        url = self.get_url(message_id)
+        with self.subTest('should not allow to delete a message without rights'):
+            response = self.client.delete(url)
+            self.assertEqual(response.status_code, 404)
+        self.room_role.role = RoomRoleEnum.MODERATOR
+        self.db_session.add(self.room_role)
+        self.db_session.commit()
+        message = MessageFactory(
+            chat_room=self.chat_room,
+        )
+        message_id = message.id
+        url = self.get_url(message_id)
         with self.subTest('should allow delete message to mod'):
-            self.fail()
+            response = self.client.delete(url)
+            self.assertEqual(response.status_code, 204)
+            message = self.db_session.exec(
+                select(Message).where(Message.id == message_id),
+            ).first()
+        self.room_role.role = RoomRoleEnum.ADMIN
+        self.db_session.add(self.room_role)
+        self.db_session.commit()
+        message = MessageFactory(
+            chat_room=self.chat_room,
+        )
+        message_id = message.id
+        url = self.get_url(message_id)
         with self.subTest('should allow delete message to admin'):
-            self.fail()
+            response = self.client.delete(url)
+            self.assertEqual(response.status_code, 204)
+            message = self.db_session.exec(
+                select(Message).where(Message.id == message_id),
+            ).first()
 
 
 @skip('not implemented')

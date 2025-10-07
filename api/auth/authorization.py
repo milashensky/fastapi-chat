@@ -82,6 +82,8 @@ async def authenticate_token(token: str):
 
 
 def generate_user_access_token(user: User) -> AccessToken:
+    if not isinstance(user, User):
+        raise TypeError('Invalid value of user')
     access_token = create_access_token(
         data={'sub': str(user.id)},
     )

@@ -1,9 +1,9 @@
 import datetime
 from typing import Annotated, List
 import uuid
+
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
-from sqlmodel import desc
+from sqlmodel import desc, select
 
 from auth.authorization import get_current_user
 from chat.models import (
@@ -18,6 +18,7 @@ from chat.schemas import (
     ChatRoomUpdate,
     CreateMessageBody,
     CreateRoomBody,
+    MessageUpdateBody,
     MessagesList,
     PublicChatInvite,
     PublicChatRoom,
@@ -31,12 +32,22 @@ from utils.pagination import paginate_response, pagination_dep
 chat_router = APIRouter()
 
 
+def patch_model(model, data, db_session):
+    update_data = data.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(model, key, value)
+    db_session.add(model)
+    db_session.commit()
+    db_session.refresh(model)
+    return model
+
+
 def get_user_chat_rooms(
     current_user: Annotated[list, Depends(get_current_user)],
     db_session: SessionDep,
 ):
     statement = select(ChatRoom).join(RoomRole).where(RoomRole.user_id == current_user.id)
-    chat_rooms = db_session.exec(statement).scalars().all()
+    chat_rooms = db_session.exec(statement).all()
     return chat_rooms
 
 
@@ -78,7 +89,7 @@ def get_user_chat_room(
             ChatRoom.id == room_id,
         )
     )
-    chat_room = db_session.exec(statement).scalar_one_or_none()
+    chat_room = db_session.exec(statement).first()
     if not chat_room:
         raise HTTPException(404, 'Not Found')
     return chat_room
@@ -106,7 +117,7 @@ def get_user_chat_room_with_access(
                 RoomRole.chat_room_id == room_id,
             )
         )
-        room_role = db_session.exec(role_query).scalar_one_or_none()
+        room_role = db_session.exec(role_query).first()
         if not room_role:
             raise HTTPException(404, 'Not Found')
         # allow access if not set
@@ -124,13 +135,7 @@ async def update_chat_room_api(
     room: Annotated[ChatRoom, Depends(get_user_chat_room_with_access(allow_for_roles=[RoomRoleEnum.MODERATOR, RoomRoleEnum.ADMIN]))],
     db_session: SessionDep,
 ):
-    update_data = data.model_dump(exclude_unset=True)
-    for key, value in update_data.items():
-        setattr(room, key, value)
-    db_session.add(room)
-    db_session.commit()
-    db_session.refresh(room)
-    return room
+    return patch_model(room, data, db_session)
 
 
 
@@ -156,7 +161,7 @@ async def create_invite_api(
         RoomInvite.chat_room_id == room.id,
         RoomInvite.expires_at > max_expiry,
     )
-    valid_invite = db_session.exec(valid_invite_query).scalar_one_or_none()
+    valid_invite = db_session.exec(valid_invite_query).first()
     if valid_invite:
         return valid_invite
     new_invite = RoomInvite(
@@ -178,7 +183,7 @@ async def accept_invite_api(
     invite_query = select(RoomInvite).where(
         RoomInvite.id == invite_id,
     )
-    invite = db_session.exec(invite_query).scalar_one_or_none()
+    invite = db_session.exec(invite_query).first()
     if not invite:
         raise HTTPException(404, 'Not Found')
     if invite.expires_at < now:
@@ -191,7 +196,7 @@ async def accept_invite_api(
             RoomRole.chat_room_id == chat_room.id,
         )
     )
-    room_role = db_session.exec(role_query).scalar_one_or_none()
+    room_role = db_session.exec(role_query).first()
     if room_role:
         raise HTTPException(412, 'Already in the room')
     new_role = RoomInvite(
@@ -223,7 +228,7 @@ async def create_message_api(
     return message
 
 
-@chat_router.get('/room/{room_id}/message', name='chat:list_messages_api', response_model=MessagesList, status_code=200)
+@chat_router.get('/room/{room_id}/message', name='chat:list_messages_api', response_model=MessagesList)
 async def list_messages_api(
     pagination: Annotated[dict, Depends(pagination_dep)],
     room: Annotated[ChatRoom, Depends(get_user_chat_room)],
@@ -247,3 +252,54 @@ async def list_messages_api(
         pagination=pagination,
         db_session=db_session,
     )
+
+
+@chat_router.patch('/message/{message_id}', name='chat:update_message_api', response_model=PublicMessage)
+async def update_message_api(
+    data: MessageUpdateBody,
+    current_user: Annotated[list, Depends(get_current_user)],
+    message_id,
+    db_session: SessionDep,
+):
+    message = db_session.exec(
+        select(Message)
+        .where(
+            Message.id == message_id,
+            Message.created_by_id == current_user.id,
+            Message.type == MessageTypeEnum.TEXT,
+        )
+    ).first()
+    if not message:
+        raise HTTPException(404, 'Not Found')
+    return patch_model(message, data, db_session)
+
+
+@chat_router.delete('/message/{message_id}', name='chat:delete_message_api', response_model=None, status_code=204)
+async def delete_message_api(
+    current_user: Annotated[list, Depends(get_current_user)],
+    message_id,
+    db_session: SessionDep,
+):
+    message = db_session.exec(
+        select(Message)
+        .where(
+            Message.id == message_id,
+            Message.type == MessageTypeEnum.TEXT,
+        )
+    ).first()
+    if not message:
+        raise HTTPException(404, 'Not Found')
+    if message.created_by_id != current_user.id:
+        chat_role = db_session.exec(
+            select(RoomRole)
+            .where(
+                RoomRole.user_id == current_user.id,
+                RoomRole.chat_room_id == message.chat_room_id,
+                RoomRole.role.in_([RoomRoleEnum.ADMIN, RoomRoleEnum.MODERATOR]),
+            )
+        ).first()
+        if not chat_role:
+            raise HTTPException(404, 'Not Found')
+    db_session.delete(message)
+    db_session.commit()
+    return None
