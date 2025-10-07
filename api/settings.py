@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     base_dir: str | pathlib.Path = pathlib.Path(__file__).parent.resolve()
 
     access_token_hash_algorithm: str = 'HS256'
-    access_token_expire_minutes: int = 30
+    access_token_expire_minutes: int = 60
 
     chat_invite_valid_hours: int = 24
     max_invite_reuse_before_expiry_min: int = 10

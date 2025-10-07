@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import {
     isRouteErrorResponse,
     Links,
@@ -7,9 +8,10 @@ import {
     ScrollRestoration,
 } from "react-router";
 
-import { setupRequest } from "./utils/request"
+import { setupRequest } from "~/utils/request"
+import { useAuthStore } from "~/auth/auth-store"
+import { TOKEN_REFRESH_THRESHOLD_MS } from "~/utils/constants";
 import type { Route } from "./+types/root"
-import { useAuthStore } from "./auth/auth-store"
 import "~/styles/main.css"
 
 export const clientLoader = async () => {
@@ -59,6 +61,29 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+    const accessToken = useAuthStore((state) => state.accessToken)
+    const refreshAccessToken = useAuthStore((state) => state.refreshAccessToken)
+    const timerId = useRef<NodeJS.Timeout>(undefined)
+    const checkAccessTokenExpiry = () => {
+        if (!accessToken) {
+            return
+        }
+        const expiryTimestamp = accessToken.expires_at * 1000
+        const now = new Date().getTime()
+        const delta = expiryTimestamp - now
+        const timeoutDelay = delta - TOKEN_REFRESH_THRESHOLD_MS
+        if (timeoutDelay <= 0) {
+            refreshAccessToken()
+            return
+        }
+        timerId.current = setTimeout(checkAccessTokenExpiry, timeoutDelay)
+    }
+    useEffect(() => {
+        checkAccessTokenExpiry()
+        return () => {
+            clearTimeout(timerId.current)
+        }
+    }, [accessToken])
     return <Outlet />;
 }
 
