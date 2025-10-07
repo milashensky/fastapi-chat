@@ -1,6 +1,8 @@
 from typing import Protocol
 from fastapi import HTTPException, status
 from fastapi import Request as BaseRequest
+from sqlmodel import Session
+from db import SessionDep
 from utils.request import Request
 
 
@@ -11,11 +13,12 @@ class Authorizer(Protocol):
 
 class BaseApi:
     authorizers: list[Authorizer] | None = None
+    db_session: Session
 
     @classmethod
     def as_view(cls):
 
-        async def handle_request(request: BaseRequest):
+        async def handle_request(request: BaseRequest, db_session: SessionDep):
             view = cls()
             wrapped_request = Request(
                 scope=request.scope,
@@ -23,6 +26,7 @@ class BaseApi:
                 send=request._send,
             )
             view.request = wrapped_request
+            view.db_session = db_session
             return await view.dispatch(request=wrapped_request)
 
         return handle_request

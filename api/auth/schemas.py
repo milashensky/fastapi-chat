@@ -33,7 +33,6 @@ class PublicUser(BaseModel):
 
     id: int
     name: Optional[str]
-    email: str
 
 
 class LoginUserResponse(BaseModel):

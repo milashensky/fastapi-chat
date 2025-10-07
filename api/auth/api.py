@@ -66,11 +66,10 @@ class CurrentUserApi(BaseApi):
 
 
 class UserApi(BaseApi):
-    authorizers = [require_authentication, require_superuser]
+    authorizers = [require_authentication]
 
     async def get(self, request, user_id):
-        with get_session() as db_session:
-            user = db_session.get(User, user_id)
+        user = self.db_session.get(User, user_id)
         if not user:
             raise HTTPException(status_code=404, detail='User not found')
         return PublicUser.model_validate(user)

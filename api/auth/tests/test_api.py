@@ -110,7 +110,6 @@ class RegistrationApiTestCase(ApiTestCase):
             self.assertEqual(response_data['user'], {
                 'id': user.id,
                 'name': user.name,
-                'email': user.email,
             })
             access_token = generate_user_access_token(user)
             self.assertEqual(response_data['access_token'], {
@@ -137,7 +136,6 @@ class CurrentUserTestCase(ApiTestCase):
             self.assertEqual(response_data['user'], {
                 'id': self.user.id,
                 'name': self.user.name,
-                'email': self.user.email,
             })
             self.assertEqual(response_data['access_token'], {
                 'token': self.client.access_token.token,
@@ -218,7 +216,6 @@ class LoginViewTestCase(ApiTestCase):
             self.assertEqual(response_data['user'], {
                 'id': self.user.id,
                 'name': self.user.name,
-                'email': self.user.email,
             })
             self.assertEqual(response_data['access_token'], {
                 'token': ANY,
