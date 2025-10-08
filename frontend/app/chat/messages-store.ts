@@ -18,6 +18,7 @@ import {
     type ListConfig as BaseListConfig,
     type RequestConfig,
 } from "~/utils/useModel"
+import { asList } from "~/utils/asList"
 
 type MessageId = ChatMessage['id']
 
@@ -108,3 +109,5 @@ export const useMessagesStore = create<MessagesStore>(
         },
     ),
 )
+
+export const getMessages = (state: MessagesStore) => asList(state.messages)

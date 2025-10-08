@@ -8,6 +8,7 @@ import type {
     UpdateChatForm,
 } from "./types"
 import { excludeNullish } from "~/utils/excludeNullish"
+import { asList } from "~/utils/asList";
 
 type RoomId = ChatRoom['id']
 
@@ -82,4 +83,4 @@ export const useChatsStore = create<ChatsStore>(
     ),
 )
 
-export const getChats = (state: ChatsStore): ChatRoom[] => Object.values(state.chatRooms).filter(excludeNullish)
+export const getChats = (state: ChatsStore): ChatRoom[] => asList(state.chatRooms)

@@ -525,6 +525,18 @@ class RoomRoleApiTestCase(ChatApiTestCase):
             self.assertEqual(room_role.user, role_user)
             self.assertEqual(room_role.chat_room, self.chat_room)
 
+    def assert_exit_message(self, removed_role, removed_by):
+        exit_message = self.db_session.exec(
+            select(Message).where(
+                Message.chat_room_id == self.chat_room.id,
+                Message.created_by_id == removed_by.id,
+                Message.type == MessageTypeEnum.SYSTEM_ANNOUNCEMENT,
+            ).order_by(Message.created_at.desc())
+        ).first()
+        self.assertIsNotNone(exit_message)
+        self.assertIn(removed_role.user.name, exit_message.content)
+        self.assertIn('left the chat', exit_message.content)
+
     def test_delete(self):
         room_role = RoomRoleFactory(
             chat_room=self.chat_room,
@@ -547,6 +559,11 @@ class RoomRoleApiTestCase(ChatApiTestCase):
         with self.subTest('should allow delete role to owner'):
             response = self.client.delete(url)
             self.assertEqual(response.status_code, 204)
+            with self.subTest('should publish exit message'):
+                self.assert_exit_message(
+                    removed_role=room_role,
+                    removed_by=room_role.user,
+                )
             room_role = self.db_session.exec(select(RoomRole).where(RoomRole.id == role_id)).first()
             self.assertIsNone(room_role)
         self.client.force_login(self.user)
@@ -558,6 +575,11 @@ class RoomRoleApiTestCase(ChatApiTestCase):
         with self.subTest('should allow delete role to admin'):
             response = self.client.delete(url)
             self.assertEqual(response.status_code, 204)
+            with self.subTest('should publish exit message'):
+                self.assert_exit_message(
+                    removed_role=room_role,
+                    removed_by=self.user,
+                )
             room_role = self.db_session.exec(select(RoomRole).where(RoomRole.id == role_id)).first()
             self.assertIsNone(room_role)
         self.room_role.role = RoomRoleEnum.MODERATOR
@@ -571,6 +593,11 @@ class RoomRoleApiTestCase(ChatApiTestCase):
         with self.subTest('should allow delete role to mod'):
             response = self.client.delete(url)
             self.assertEqual(response.status_code, 204)
+            with self.subTest('should publish exit message'):
+                self.assert_exit_message(
+                    removed_role=room_role,
+                    removed_by=self.user,
+                )
             room_role = self.db_session.exec(select(RoomRole).where(RoomRole.id == role_id)).first()
             self.assertIsNone(room_role)
 
@@ -595,7 +622,7 @@ class ChatInviteApiTestCase(ChatApiTestCase):
             role = self.db_session.exec(
                 select(RoomRole)
                 .where(
-                    RoomRole.chat_room_id == self.chat_room.id,
+                    RoomRole.chat_room_id == chat_room.id,
                     RoomRole.user_id == self.user.id
                 )
             ).first()
@@ -604,6 +631,17 @@ class ChatInviteApiTestCase(ChatApiTestCase):
                 response.json(),
                 serialize_room(chat_room),
             )
+            with self.subTest('should create enter message'):
+                enter_message = self.db_session.exec(
+                    select(Message).where(
+                        Message.chat_room_id == chat_room.id,
+                        Message.created_by_id == self.user.id,
+                        Message.type == MessageTypeEnum.SYSTEM_ANNOUNCEMENT,
+                    ).order_by(Message.created_at.desc())
+                ).first()
+                self.assertIsNotNone(enter_message)
+                self.assertIn(role.user.name, enter_message.content)
+                self.assertIn('entered the chat', enter_message.content)
         invite = RoomInviteFactory(chat_room=self.chat_room)
         url = self.get_url(invite.id)
         with self.subTest('should not add a user already has role'):
@@ -616,6 +654,14 @@ class ChatInviteApiTestCase(ChatApiTestCase):
         with self.subTest('should not work past expiry'):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 410)
+            role = self.db_session.exec(
+                select(RoomRole)
+                .where(
+                    RoomRole.chat_room_id == invite.chat_room.id,
+                    RoomRole.user_id == self.user.id
+                )
+            ).first()
+            self.assertIsNone(role)
 
     def test_create(self):
         url = self.get_url()

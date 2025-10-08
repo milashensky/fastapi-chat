@@ -7,7 +7,7 @@ from auth.models import User
 from auth.password import verify_password
 from db import get_session
 from utils.test_matchers import StringContaining
-from utils.base_tests import ApiTestCase
+from utils.base_tests import ApiTestCase, override_settings
 
 
 class RegistrationApiTestCase(ApiTestCase):
@@ -250,6 +250,7 @@ class AccessTokenApiTestCase(ApiTestCase):
                 },
             )
 
+    @override_settings(access_token_expire_minutes=30)
     def test_post(self):
         with self.subTest('should fail if not logged in'):
             response = self.client.post(self.url)

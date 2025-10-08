@@ -67,8 +67,7 @@ class Message(SQLModel, table=True):
         default=None,
         sa_column=Column(DateTime(), onupdate=func.now()),
     )
-    chat_room_id: int | None = Field(
-        default=None,
+    chat_room_id: int = Field(
         foreign_key='chat_room.id',
         ondelete="CASCADE",
     )
@@ -98,8 +97,7 @@ class RoomInvite(SQLModel, table=True):
         foreign_key='auth_users.id',
         ondelete="SET NULL",
     )
-    chat_room_id: int | None = Field(
-        default=None,
+    chat_room_id: int = Field(
         foreign_key='chat_room.id',
         ondelete="CASCADE",
     )
@@ -122,15 +120,13 @@ class RoomRole(SQLModel, table=True):
     )
 
     id: int | None = Field(default=None, primary_key=True)
-    chat_room_id: int | None = Field(
-        default=None,
+    chat_room_id: int = Field(
         foreign_key='chat_room.id',
         ondelete="CASCADE",
     )
     chat_room: ChatRoom = Relationship(back_populates='roles')
-    user_id: Optional[int] = Field(
+    user_id: int = Field(
         index=True,
-        default=None,
         foreign_key='auth_users.id',
         ondelete="CASCADE",
     )

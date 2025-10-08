@@ -3,11 +3,29 @@ import { describe } from 'vitest'
 
 export const describeHook = (testName, callback, { constructor, defaults = {} }) => describe(testName, (options) => {
     const mountHook = (overrides = {}) => {
-        const { result } = renderHook(() => constructor({
+        const {
+            result,
+            rerender,
+            unmount,
+        } = renderHook(() => constructor({
             ...defaults,
             ...overrides,
         }))
-        return result
+        const renderedHook = new Proxy(
+            {},
+            {
+                get(target, property) {
+                    if (property === 'rerender') {
+                        return rerender
+                    }
+                    if (property === 'unmount') {
+                        return unmount
+                    }
+                    return result[property]
+                },
+            },
+        )
+        return renderedHook
     }
 
     callback({

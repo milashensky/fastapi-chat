@@ -203,12 +203,19 @@ async def accept_invite_api(
     room_role = db_session.exec(role_query).first()
     if room_role:
         raise HTTPException(412, 'Already in the room')
-    new_role = RoomInvite(
-        created_by_id=current_user.id,
+    new_role = RoomRole(
+        user_id=current_user.id,
         chat_room_id=chat_room.id,
         invite_id=invite_id,
     )
     db_session.add(new_role)
+    enter_message = Message(
+        chat_room_id=chat_room.id,
+        created_by_id=current_user.id,
+        type=MessageTypeEnum.SYSTEM_ANNOUNCEMENT,
+        content=f'User {current_user.name} entered the chat.',
+    )
+    db_session.add(enter_message)
     db_session.commit()
     db_session.refresh(chat_room)
     return chat_room
@@ -358,6 +365,7 @@ async def update_room_role_api(
 
 @chat_router.delete('/room-role/{role_id}', name='chat:delete_room_role_api', response_model=None, status_code=204)
 async def delete_room_role_api(
+    current_user: Annotated[User, Depends(get_current_user)],
     role_pair: Annotated[RolePair, Depends(get_room_role)],
     db_session: SessionDep,
 ):
@@ -367,5 +375,12 @@ async def delete_room_role_api(
     ):
         raise HTTPException(403, 'Not enough permissions to perform the action')
     db_session.delete(role_pair.room_role)
+    exit_message = Message(
+        chat_room_id=role_pair.room_role.chat_room_id,
+        created_by_id=current_user.id,
+        type=MessageTypeEnum.SYSTEM_ANNOUNCEMENT,
+        content=f'User {role_pair.room_role.user.name} left the chat.',
+    )
+    db_session.add(exit_message)
     db_session.commit()
     return None
