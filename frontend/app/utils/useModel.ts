@@ -2,18 +2,16 @@ import axios from "axios"
 
 type Pk = string | number
 
+type RequestOptions = Record<string, unknown>
+
 interface ModelOptions<Item extends unknown, ItemPk = Pk>{
     baseUrl: string,
     storeItem: (pk: ItemPk, item: Item | null) => void
     deleteItem: (pk: ItemPk) => void
     getItemPk?: (item: Item) => ItemPk
     getItem?: (pk: ItemPk) => Item | null | undefined
-    getListUrl?: () => string
-    getItemUrl?: (pk: ItemPk) => string
-}
-
-interface RequestConfig<Item extends unknown, Response extends unknown> {
-    handleResponse?: (responseData: Response) => void
+    getListUrl?: (options: RequestOptions) => string
+    getItemUrl?: (pk: ItemPk, options: RequestOptions) => string
 }
 
 interface ItemRequestConfig<
@@ -23,7 +21,11 @@ interface ItemRequestConfig<
     extractItem?: (responseData: ItemResponse) => Item
 }
 
-interface ListConfig<
+export interface RequestConfig<Item extends unknown, Response extends unknown> extends RequestOptions {
+    handleResponse?: (responseData: Response) => void
+}
+
+export interface ListConfig<
     Item extends unknown,
     ListResponse extends unknown,
     Filters extends unknown,
@@ -82,15 +84,15 @@ export const useModel = <
         getItem,
         deleteItem,
     } = options
-    const getItemUrl = (itemPk: ItemPk): string => {
+    const getItemUrl = (itemPk: ItemPk, requestOptions: RequestOptions): string => {
         if (options.getItemUrl) {
-            return options.getItemUrl(itemPk)
+            return options.getItemUrl(itemPk, requestOptions)
         }
         return `${options.baseUrl}/${itemPk}`
     }
-    const getListUrl = () => {
+    const getListUrl = (requestOptions: RequestOptions) => {
         if (options.getListUrl) {
-            return options.getListUrl()
+            return options.getListUrl(requestOptions)
         }
         return options.baseUrl
     }
@@ -104,7 +106,7 @@ export const useModel = <
                     items.forEach((item) => storeItem(getItemPk(item), item))
                 },
             } = config
-            const url = getListUrl()
+            const url = getListUrl(config)
             const response = await axios.get<ListResponse>(url, {
                 params: filters,
             })
@@ -120,7 +122,7 @@ export const useModel = <
                     storeItem(itemPk, item)
                 },
             } = config
-            const url = getItemUrl(itemPk)
+            const url = getItemUrl(itemPk, config)
             const response = await axios.get<FetchResponse>(url)
             const responseData = response.data
             handleResponse(responseData)
@@ -145,7 +147,7 @@ export const useModel = <
                     storeItem(getItemPk(item), item)
                 },
             } = config
-            const url = getListUrl()
+            const url = getListUrl(config)
             const response = await axios.post<CreateResponse>(url, itemBody)
             const responseData = response.data
             handleResponse(responseData)
@@ -159,7 +161,7 @@ export const useModel = <
                     storeItem(itemPk, item)
                 },
             } = config
-            const url = getItemUrl(itemPk)
+            const url = getItemUrl(itemPk, config)
             const response = await axios.patch<UpdateResponse>(url, itemBody)
             const responseData = response.data
             handleResponse(responseData)
@@ -171,7 +173,7 @@ export const useModel = <
                     deleteItem(itemPk)
                 },
             } = config
-            const url = getItemUrl(itemPk)
+            const url = getItemUrl(itemPk, config)
             const response = await axios.delete<DeleteResponse>(url)
             const responseData = response.data
             handleResponse(responseData)

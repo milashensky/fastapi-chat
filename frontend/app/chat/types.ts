@@ -38,6 +38,12 @@ export interface ChatMessage {
     updated_at?: string
 }
 
+export interface CreateMessageForm {
+    content: string
+}
+
+export type UpdateMessageForm = Partial<CreateMessageForm>
+
 export interface ChatRoomInvite {
     id: string
 }

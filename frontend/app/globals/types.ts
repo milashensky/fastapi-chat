@@ -19,3 +19,12 @@ export type Override<TBase, TOverride> = Omit<TBase, keyof TOverride> & TOverrid
 export type GenericProps = Partial<{
     [key: `data-${string}`]: string
 }>
+
+export interface PaginationFilters {
+    page?: number
+    page_size?: number
+}
+
+export interface SearchFilters {
+    search?: string
+}
