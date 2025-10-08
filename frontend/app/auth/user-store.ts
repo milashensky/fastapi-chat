@@ -1,12 +1,17 @@
 import { create } from "zustand";
 import { combine } from 'zustand/middleware'
+import type { IdModelTable } from "~/globals/types";
+import { useModel, type ModelDefenition } from "~/utils/useModel"
 import type { User } from "./types"
-import { useModel } from "~/utils/useModel"
+
+interface UserDefenition extends ModelDefenition<User> {
+    ItemPk: User['id']
+}
 
 export const useUserStore = create(
     combine(
         {
-            users: {} as {[pk: User['id']]: User | null},
+            users: {} as IdModelTable<User>,
         },
         (set, get) => {
             const storeUser = (userId: User['id'], user: User | null) => {
@@ -27,7 +32,7 @@ export const useUserStore = create(
             const {
                 getOrFetch,
                 fetch,
-            } = useModel<User, User['id']>({
+            } = useModel<User, UserDefenition>({
                 baseUrl: '/api/auth/user',
                 storeItem: storeUser,
                 deleteItem: unstoreUser,

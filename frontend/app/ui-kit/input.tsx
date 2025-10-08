@@ -1,8 +1,10 @@
 import ErrorList from '~/ui-kit/error-list'
+import { extractDataProps } from '~/utils/extractDataProps'
 import { useFormValidator, type FieldValidator } from './form'
+import type { GenericProps } from '~/globals/types'
 // import "./styles/input.scss"
 
-interface Props <T = string>{
+interface Props <T = string> extends GenericProps {
     id?: string
     name?: string
     value?: T
@@ -16,6 +18,10 @@ interface Props <T = string>{
 }
 
 export default (props: Props) => {
+    const dataProps = extractDataProps(props)
+    const {
+        type = 'text'
+    } = props
     const handleInput = (e: React.InputEvent<HTMLInputElement>) => {
         if (!props.onInput) {
             return
@@ -36,12 +42,13 @@ export default (props: Props) => {
         <label>
             { props.label }
             <input
+                {...dataProps}
                 id={props.id}
                 name={props.name}
                 value={props.value}
                 placeholder={props.placeholder}
                 disabled={props.disabled}
-                type={props.type}
+                type={type}
                 aria-invalid={allErrors.length > 0}
                 onInput={handleInput}
             />

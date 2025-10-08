@@ -3,6 +3,14 @@ import { describe } from 'vitest'
 import * as reactRouter from 'react-router'
 
 export const describeComponent = (testName, callback) => describe(testName, () => {
+    vi.mock('~/ui-kit/dialog', () => ({
+        default: (props) => (
+            <div>
+                {props.children}
+            </div>
+        )
+    }))
+
     vi.mock('react-router', async (importOriginal) => {
         const original = await importOriginal()
         return {

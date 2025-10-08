@@ -39,18 +39,43 @@ export class ModelSetupError extends Error {
     }
 }
 
+interface DefaultDefenition {
+    ItemPk: Pk
+    ListFilters: unknown,
+    ListResponse: unknown,
+    FetchResponse: unknown,
+    CreateItemBody: unknown,
+    CreateResponse: unknown,
+    UpdateItemBody: unknown,
+    UpdateResponse: unknown,
+    DeleteResponse: unknown,
+}
+
+export interface ModelDefenition<Item>{
+    ItemPk: Pk
+    ListFilters: unknown,
+    ListResponse: Item[],
+    FetchResponse: Item,
+    CreateItemBody: Omit<Item, 'id'>,
+    CreateResponse: Item,
+    UpdateItemBody: Partial<Item>,
+    UpdateResponse: Item,
+    DeleteResponse: null,
+}
+
 export const useModel = <
     Item,
-    ItemPk = Pk,
-    ListFilters = unknown,
-    ListResponse = Item[],
-    FetchResponse = Item,
-    CreateItemBody = Omit<Item, 'id'>,
-    CreateResponse = Item,
-    UpdateItemBody = Partial<Item>,
-    UpdateResponse = Item,
-    DeleteResponse = null,
->(options: ModelOptions<Item, ItemPk>) => {
+    Defenitions extends DefaultDefenition = ModelDefenition<Item>,
+>(options: ModelOptions<Item, Defenitions['ItemPk']>) => {
+    type ItemPk = Defenitions['ItemPk']
+    type ListFilters = Defenitions['ListFilters']
+    type ListResponse = Defenitions['ListResponse']
+    type FetchResponse = Defenitions['FetchResponse']
+    type CreateItemBody = Defenitions['CreateItemBody']
+    type CreateResponse = Defenitions['CreateResponse']
+    type UpdateItemBody = Defenitions['UpdateItemBody']
+    type UpdateResponse = Defenitions['UpdateResponse']
+    type DeleteResponse = Defenitions['DeleteResponse']
     const {
         getItemPk = (item: Item) => (item as Item & {id: ItemPk}).id,
         storeItem,

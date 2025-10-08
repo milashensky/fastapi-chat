@@ -1,7 +1,8 @@
 import { faker } from '@faker-js/faker'
 
-export const userFactory = (overrides = {}) => ({
+export const chatRoomFactory = (overrides = {}) => ({
     id: faker.number.int(),
     name: faker.person.fullName(),
+    roles: [],
     ...overrides,
 })

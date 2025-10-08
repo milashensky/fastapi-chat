@@ -11,6 +11,9 @@ export default [
         route("registration", "./auth/registration.tsx"),
     ]),
     layout("./auth/auth-required-layout.tsx", [
-        index("routes/home.tsx"),
+        layout('./chat/layout.tsx', [
+            route("chat/:roomId", "./chat/details/chat-view.tsx"),
+            index("routes/home.tsx"),
+        ])
     ])
 ] satisfies RouteConfig;
