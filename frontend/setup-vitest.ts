@@ -6,6 +6,7 @@ afterEach(() => {
     cleanup()
     vi.clearAllMocks()
     vi.restoreAllMocks()
+    vi.unstubAllEnvs()
 });
 
 // Mock window.matchMedia for required components

@@ -3,6 +3,11 @@ export interface User {
     name?: string
 }
 
+export interface DeletedUser {
+    id: null
+    name: 'Deleted user'
+}
+
 export interface AccessToken {
     token: string
     token_type: 'Bearer'

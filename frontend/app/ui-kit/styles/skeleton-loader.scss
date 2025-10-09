@@ -1,0 +1,21 @@
+@layer components {
+    .skeleton-loader {
+        @keyframes fade {
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        background-color: var(--border-color);
+        height: 1em;
+        min-width: 100%;
+        width: 100%;
+        border-radius: var(--radius-lg);
+        animation: fade 2s infinite ease-in-out;
+    }
+}

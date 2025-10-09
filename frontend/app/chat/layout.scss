@@ -1,4 +1,4 @@
-@use '~/styles/mixins.scss' as mixins;
+@use '~/globals/styles/mixins.scss' as mixins;
 
 @layer components {
     .layout {
@@ -27,6 +27,7 @@
 
         @include mixins.sm {
             scroll-snap-type: x mandatory;
+            overflow-x: auto;
 
             nav,
             main {
@@ -35,7 +36,6 @@
                 overflow: hidden;
                 flex: 0 0 100vw;
                 scroll-snap-align: start;
-                scroll-snap-stop: always;
             }
 
         }

@@ -1,0 +1,23 @@
+.message-group-date {
+    position: relative;
+    display: flex;
+    align-self: center;
+    margin: 8px 0;
+    padding: 2px 8px;
+
+    &::before {
+        content: '';
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        position: absolute;
+        opacity: 0.3;
+        border-radius: var(--radius-lg);
+        background-color: var(--text-color);
+    }
+    .date {
+        color: var(--color-white);
+        z-index: 1;
+    }
+}

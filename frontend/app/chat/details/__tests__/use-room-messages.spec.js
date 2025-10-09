@@ -46,18 +46,18 @@ describeHook('useRoomMessages', ({ mountHook }) => {
             })
             const controller = mountHook()
             expect(controller.current.messages).toStrictEqual([
-                message1Room1,
-                message3Room1,
                 message2Room1,
+                message3Room1,
+                message1Room1,
             ])
         })
 
         it('should return text messages matching search if defined', async () => {
             useMessagesStore.setState({
                 messages: {
-                    [message3Room1.id]: message3Room1,
-                    [message2Room1.id]: message2Room1,
                     [message1Room1.id]: message1Room1,
+                    [message2Room1.id]: message2Room1,
+                    [message3Room1.id]: message3Room1,
                 },
             })
             const controller = mountHook({

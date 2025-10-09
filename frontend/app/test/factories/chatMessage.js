@@ -10,3 +10,14 @@ export const chatMessageFactory = (overrides = {}) => ({
     'created_at': faker.date.past().toISOString(),
     ...overrides,
 })
+
+
+export const textMessageFactory = (overrides = {}) => chatMessageFactory({
+    'type': MessageTypeEnum.TEXT,
+    ...overrides,
+})
+
+export const systemMessageFactory = (overrides = {}) => chatMessageFactory({
+    'type': MessageTypeEnum.SYSTEM_ANNOUNCEMENT,
+    ...overrides,
+})

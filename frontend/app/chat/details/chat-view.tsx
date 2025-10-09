@@ -33,7 +33,7 @@ const ChatView = (props: Props) => {
         <chatRoomContext.Provider
             value={{ roomId }}
         >
-            <div className="flex flex-col flex-1 h-full">
+            <div className="flex flex-col flex-1 h-screen overflow-hidden">
                 <div>
                     top
                 </div>

@@ -1,7 +1,16 @@
 @layer components {
     .message-list {
         display: flex;
-        flex-direction: column;
+        // helps to start scroll at the bottom without js logic
+        flex-direction: column-reverse;
+        background-color: var(--message-list-color);
+        height: 100%;
         overflow: auto;
+    }
+
+    .message-list-container {
+        display: flex;
+        flex-direction: column;
+        margin: 8px;
     }
 }

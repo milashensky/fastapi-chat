@@ -62,7 +62,7 @@ export const useRoomMessages = (options: Options) => {
         }
         return true
     })
-    const sortedMessages = filteredMessages.sort((message1, message2) => message2.created_at.localeCompare(message1.created_at))
+    const sortedMessages = filteredMessages.sort((message1, message2) => message1.created_at.localeCompare(message2.created_at))
     return {
         fetchNext,
         canFetchNext,

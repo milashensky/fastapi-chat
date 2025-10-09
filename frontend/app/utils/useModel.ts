@@ -135,7 +135,7 @@ export const useModel = <
             const storedItem = getItem(itemPk)
             if (storedItem === undefined) {
                 storeItem(itemPk, null)
-                this.fetch(itemPk)
+                actions.fetch(itemPk)
             }
             return storedItem
         },

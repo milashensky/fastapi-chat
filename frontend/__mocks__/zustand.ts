@@ -9,14 +9,29 @@ const { create: actualCreate, createStore: actualCreateStore } =
 // a variable to hold reset functions for all stores declared in the app
 export const storeResetFns = new Set<() => void>()
 
+// mocks methods, so all data actions are stubbed by default
+const getMockState = <T>(initialState: T) => {
+    if (typeof initialState !== 'object') {
+        return initialState
+    }
+    const withMocks = Object.entries(initialState as object).map(([key, value]) => {
+        if (typeof value === 'function') {
+            return [key, vi.fn()]
+        }
+        return [key, value]
+    })
+    return Object.fromEntries(withMocks)
+}
+
 const createUncurried = <T>(
     stateCreator: ZustandExportedTypes.StateCreator<T>,
 ) => {
     const store = actualCreate(stateCreator)
     const initialState = store.getInitialState()
     storeResetFns.add(() => {
-        store.setState(initialState, true)
+        store.setState(getMockState(initialState), true)
     })
+    store.setState(getMockState(initialState))
     return store
 }
 
@@ -36,8 +51,9 @@ const createStoreUncurried = <T>(
     const store = actualCreateStore(stateCreator)
     const initialState = store.getInitialState()
     storeResetFns.add(() => {
-        store.setState(initialState, true)
+        store.setState(getMockState(initialState), true)
     })
+    store.setState(getMockState(initialState))
     return store
 }
 

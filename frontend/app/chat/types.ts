@@ -33,9 +33,9 @@ export interface ChatMessage {
     content: string
     type: MessageTypeEnum
     chat_room_id: number
-    created_by_id?: number
+    created_by_id: number | null
     created_at: string
-    updated_at?: string
+    updated_at: string | null
 }
 
 export interface CreateMessageForm {

@@ -12,8 +12,7 @@ import { setupRequest } from "~/utils/request"
 import { useAuthStore } from "~/auth/auth-store"
 import { TOKEN_REFRESH_THRESHOLD_MS } from "~/utils/constants";
 import type { Route } from "./+types/root"
-import "~/styles/main.css"
-import Intersection from "./ui-kit/intersection";
+import "~/globals/styles/main.css"
 
 export const clientLoader = async () => {
     setupRequest()
