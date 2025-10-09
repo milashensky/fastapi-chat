@@ -1,6 +1,8 @@
 import './styles/icon.scss'
 
 const iconMap = {
+    'close': 'fa-solid fa-xmark',
+    'back': 'fa-solid fa-chevron-left',
     'send': 'fa-solid fa-paper-plane rotate-45',
     'vertical-ellipsis': 'fa-solid fa-ellipsis-vertical',
     'search': 'fa-solid fa-magnifying-glass',

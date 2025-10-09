@@ -12,7 +12,9 @@ export default [
     ]),
     layout("./auth/auth-required-layout.tsx", [
         layout('./chat/layout.tsx', [
-            route("chat/:roomId", "./chat/details/chat-view.tsx"),
+            route("chat/:roomId", "./chat/chat-room/chat-view.tsx", [
+                route("details", './chat/details/chat-details.tsx'),
+            ]),
             index("routes/home.tsx"),
         ])
     ])
