@@ -1,10 +1,8 @@
-import { useState } from "react"
 import { useMessagesStore } from "~/chat/messages-store"
-import Textarea from "~/ui-kit/textarea"
 import type { Route } from "../+types/layout"
-import Button from "~/ui-kit/button"
 import { chatRoomContext } from "./chat-room-context"
 import MessageList from "./message-list"
+import ChatInputForm from "./chat-inpit-form"
 
 interface Props {
     loaderData: {
@@ -18,20 +16,22 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 }
 
 const ChatView = (props: Props) => {
-    const [message, setMessage] = useState('')
     const createMessage = useMessagesStore((state) => state.create)
     const { roomId } = props.loaderData
-    const sendMessage = async () => {
+    const sendMessage = async (message: string) => {
         await createMessage({
             content: message,
         }, {
             roomId,
         })
-        setMessage('')
+    }
+    const context = {
+        roomId,
+        sendMessage,
     }
     return (
         <chatRoomContext.Provider
-            value={{ roomId }}
+            value={context}
         >
             <div className="flex flex-col flex-1 h-screen overflow-hidden">
                 <div>
@@ -40,18 +40,7 @@ const ChatView = (props: Props) => {
                 <div className="flex-1 h-full overflow-hidden">
                     <MessageList />
                 </div>
-                <div className="d-flex">
-                    <Textarea
-                        value={message}
-                        name="message"
-                        onInput={setMessage}
-                    />
-                    <Button
-                        onClick={sendMessage}
-                    >
-                        send
-                    </Button>
-                </div>
+                <ChatInputForm />
             </div>
         </chatRoomContext.Provider>
     )

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import {
     isRouteErrorResponse,
     Links,
@@ -64,7 +64,7 @@ export default function App() {
     const accessToken = useAuthStore((state) => state.accessToken)
     const refreshAccessToken = useAuthStore((state) => state.refreshAccessToken)
     const timerId = useRef<NodeJS.Timeout>(undefined)
-    const checkAccessTokenExpiry = () => {
+    const checkAccessTokenExpiry = useCallback(() => {
         if (!accessToken) {
             return
         }
@@ -77,7 +77,7 @@ export default function App() {
             return
         }
         timerId.current = setTimeout(checkAccessTokenExpiry, timeoutDelay)
-    }
+    }, [])
     useEffect(() => {
         checkAccessTokenExpiry()
         return () => {

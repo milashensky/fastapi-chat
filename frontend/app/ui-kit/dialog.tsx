@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef } from "react"
 import './styles/dialog.scss'
 
 interface Props {
@@ -20,7 +20,7 @@ const Dialog = (props: Props) => {
             props.onShow()
         }
     }
-    const hide = () => {
+    const hide = useCallback(() => {
         const dialog = dialogRef.current
         if (!dialog) {
             return
@@ -29,7 +29,7 @@ const Dialog = (props: Props) => {
         if (props.onHide) {
             props.onHide()
         }
-    }
+    }, [])
     useEffect(() => {
         if (!props.isShown) {
             hide()

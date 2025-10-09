@@ -12,6 +12,7 @@ interface Props <T = string> extends GenericProps {
     errors?: string[]
     placeholder?: string
     disabled?: boolean
+    autoFocus?: boolean
     type?: string
     rules?: FieldValidator<T>[]
     onInput?: (value: T) => void
@@ -45,6 +46,7 @@ export default (props: Props) => {
                 {...dataProps}
                 id={props.id}
                 name={props.name}
+                autoFocus={props.autoFocus}
                 value={props.value}
                 placeholder={props.placeholder}
                 disabled={props.disabled}

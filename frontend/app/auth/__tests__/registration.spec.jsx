@@ -1,4 +1,4 @@
-import { act, fireEvent, waitFor } from '@testing-library/react'
+import { act, fireEvent } from '@testing-library/react'
 import { useAuthStore } from '~/auth/auth-store'
 import { BadResponseError } from "~/utils/request"
 import { describeComponent } from '~/test/unit/componentTest'
