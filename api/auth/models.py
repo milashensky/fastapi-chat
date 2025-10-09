@@ -1,14 +1,15 @@
-import datetime
-from typing import TYPE_CHECKING, Optional, List
+from typing import TYPE_CHECKING, List
 from pydantic import EmailStr
-from sqlalchemy import Column, DateTime, UniqueConstraint, func
+from sqlalchemy import UniqueConstraint
 from sqlmodel import Field, Relationship, SQLModel
+
+from utils.models import TimestampsMixin
 
 if TYPE_CHECKING:
     from chat.models import RoomRole
 
 
-class User(SQLModel, table=True):
+class User(TimestampsMixin, SQLModel, table=True):
     __tablename__ = 'auth_users'
     __table_args__ = (UniqueConstraint('email'),)
 
@@ -18,13 +19,6 @@ class User(SQLModel, table=True):
     password: str
     is_active: bool = Field(default=True)
     is_superuser: bool = Field(default=False)
-    created_at: datetime.datetime = Field(
-        default_factory=datetime.datetime.utcnow,
-    )
-    updated_at: Optional[datetime.datetime] = Field(
-        default=None,
-        sa_column=Column(DateTime(), onupdate=func.now()),
-    )
     roles: List['RoomRole'] = Relationship(
         back_populates='user',
         cascade_delete=True,

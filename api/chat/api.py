@@ -31,6 +31,7 @@ from chat.schemas import (
 from conf import settings
 from db import SessionDep
 from utils.pagination import paginate_response, pagination_dep
+from utils.utils import get_utc_now
 
 
 chat_router = APIRouter()
@@ -183,7 +184,7 @@ async def accept_invite_api(
     current_user: Annotated[User, Depends(get_current_user)],
     db_session: SessionDep,
 ):
-    now = datetime.datetime.now()
+    now = get_utc_now()
     invite_query = select(RoomInvite).where(
         RoomInvite.id == invite_id,
     )

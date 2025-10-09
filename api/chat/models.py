@@ -2,27 +2,21 @@ import datetime
 import enum
 from typing import TYPE_CHECKING, Optional
 import uuid
-from sqlalchemy import Column, DateTime, func
+from sqlalchemy import Column, DateTime
 from sqlmodel import Enum, Field, SQLModel, Relationship, UniqueConstraint
 
 from conf import settings
+from utils.models import TimestampsMixin
 
 if TYPE_CHECKING:
     from auth.models import User
 
 
-class ChatRoom(SQLModel, table=True):
+class ChatRoom(TimestampsMixin, SQLModel, table=True):
     __tablename__ = 'chat_room'
 
     id: int | None = Field(default=None, primary_key=True)
     name: str = Field(index=True)
-    created_at: datetime.datetime = Field(
-        default_factory=datetime.datetime.utcnow,
-    )
-    updated_at: Optional[datetime.datetime] = Field(
-        default=None,
-        sa_column=Column(DateTime(), onupdate=func.now()),
-    )
     created_by_id: int | None = Field(
         default=None,
         foreign_key='auth_users.id',
@@ -47,7 +41,7 @@ class MessageTypeEnum(enum.Enum):
     SYSTEM_ANNOUNCEMENT = 'system_announcement'
 
 
-class Message(SQLModel, table=True):
+class Message(TimestampsMixin, SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     content: str
     type: MessageTypeEnum = Field(
@@ -59,13 +53,6 @@ class Message(SQLModel, table=True):
         default=None,
         foreign_key='auth_users.id',
         ondelete="SET NULL",
-    )
-    created_at: datetime.datetime = Field(
-        default_factory=datetime.datetime.utcnow,
-    )
-    updated_at: Optional[datetime.datetime] = Field(
-        default=None,
-        sa_column=Column(DateTime(), onupdate=func.now()),
     )
     chat_room_id: int = Field(
         foreign_key='chat_room.id',
@@ -85,7 +72,7 @@ def get_expires_at():
     return now + datetime.timedelta(hours=settings.chat_invite_valid_hours)
 
 
-class RoomInvite(SQLModel, table=True):
+class RoomInvite(TimestampsMixin, SQLModel, table=True):
     __tablename__ = 'chat_room_invite'
 
     id: uuid.UUID = Field(
@@ -104,17 +91,11 @@ class RoomInvite(SQLModel, table=True):
     chat_room: ChatRoom = Relationship(back_populates='invites')
     expires_at: datetime.datetime = Field(
         default_factory=get_expires_at,
-    )
-    created_at: datetime.datetime = Field(
-        default_factory=datetime.datetime.utcnow,
-    )
-    updated_at: Optional[datetime.datetime] = Field(
-        default=None,
-        sa_column=Column(DateTime(), onupdate=func.now()),
+        sa_type=DateTime(timezone=True),
     )
 
 
-class RoomRole(SQLModel, table=True):
+class RoomRole(TimestampsMixin, SQLModel, table=True):
     __table_args__ = (
         UniqueConstraint('chat_room_id', 'user_id', name='unique_user_in_room'),
     )
@@ -134,13 +115,6 @@ class RoomRole(SQLModel, table=True):
     role: RoomRoleEnum = Field(
         default=RoomRoleEnum.USER,
         sa_column=Column(Enum(RoomRoleEnum)),
-    )
-    created_at: datetime.datetime = Field(
-        default_factory=datetime.datetime.utcnow,
-    )
-    updated_at: Optional[datetime.datetime] = Field(
-        default=None,
-        sa_column=Column(DateTime(), onupdate=func.now()),
     )
     invite_id: Optional[uuid.UUID] = Field(
         default=None,

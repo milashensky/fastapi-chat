@@ -5,6 +5,7 @@ from sqlmodel import select
 from auth.authorization import generate_user_access_token
 from auth.models import User
 from auth.password import verify_password
+from auth.tests.factories import UserFactory
 from db import get_session
 from utils.test_matchers import StringContaining
 from utils.base_tests import ApiTestCase, override_settings
@@ -267,3 +268,26 @@ class AccessTokenApiTestCase(ApiTestCase):
             self.assertNotEqual(response_data['token'], self.client.access_token.token)
             # now + 30 min
             self.assertEqual(response_data['expires_at'], 1760100600)
+
+
+class UserApiTestCase(ApiTestCase):
+    def get_url(self, pk):
+        return self.app.url_path_for('auth:get_user', user_id=pk)
+
+    def test_get(self):
+        user = UserFactory()
+        url = self.get_url(user.id)
+        with self.subTest('should fail if not logged in'):
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 401)
+        self.client.force_login(self.user)
+        with (self.subTest('should return public user info')):
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            self.assertDictEqual(
+                response.json(),
+                {
+                    'id': user.id,
+                    'name': user.name,
+                },
+            )
