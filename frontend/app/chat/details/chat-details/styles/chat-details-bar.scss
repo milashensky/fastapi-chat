@@ -1,0 +1,13 @@
+@layer components {
+    .chat-room-top-bar {
+        display: flex;
+        padding: 16px;
+        gap: 4px;
+        align-items: center;
+
+        .chat-room-title {
+            margin: 0px;
+            width: 100%;
+        }
+    }
+}

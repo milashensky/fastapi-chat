@@ -5,6 +5,7 @@ interface Props extends GenericProps {
     className?: string
     type?: "submit" | "reset" | "button"
     disabled?: boolean
+    icon?: boolean
     onClick?: () => void
     children: React.ReactNode
     color?: "primary" | "secondary"
@@ -12,12 +13,17 @@ interface Props extends GenericProps {
 
 export default (props: Props) => {
     const dataProps = extractDataProps(props)
+    const classes = [
+        props.icon && 'icon',
+        props.color,
+        props.className,
+    ].join(' ')
     return (
         <button
             {...dataProps}
             disabled={props.disabled}
             type={props.type}
-            className={[props.color, props.className].join(' ')}
+            className={classes}
             onClick={props.onClick}
         >
             {props.children}

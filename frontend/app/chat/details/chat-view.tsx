@@ -2,7 +2,8 @@ import { useMessagesStore } from "~/chat/messages-store"
 import type { Route } from "../+types/layout"
 import { chatRoomContext } from "./chat-room-context"
 import MessageList from "./message-list"
-import ChatInputForm from "./chat-inpit-form"
+import MessageInputForm from "./message-input-form"
+import ChatDetailsBar from "./chat-details/chat-details-bar"
 
 interface Props {
     loaderData: {
@@ -34,13 +35,11 @@ const ChatView = (props: Props) => {
             value={context}
         >
             <div className="flex flex-col flex-1 h-screen overflow-hidden">
-                <div>
-                    top
-                </div>
+                <ChatDetailsBar />
                 <div className="flex-1 h-full overflow-hidden">
                     <MessageList />
                 </div>
-                <ChatInputForm />
+                <MessageInputForm />
             </div>
         </chatRoomContext.Provider>
     )

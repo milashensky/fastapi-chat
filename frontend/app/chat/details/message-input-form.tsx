@@ -1,12 +1,13 @@
 import { useContext, useState } from 'react'
 import Textarea from "~/ui-kit/textarea"
 import Button from "~/ui-kit/button"
+import Icon from '~/ui-kit/icon'
 import { useKeyboardShortcut } from '~/utils/useKeyboardShortcut'
 import { chatRoomContext } from "./chat-room-context"
 import './styles/chat-input-form.scss'
 
 
-const ChatInputForm = () => {
+const MessageInputForm = () => {
     const [message, setMessage] = useState('')
     const context = useContext(chatRoomContext)
     const cleanedMessage = message.trim()
@@ -36,13 +37,14 @@ const ChatInputForm = () => {
                 cleanedMessage &&
                 <Button
                     className="message-send"
+                    icon
                     onClick={sendMessage}
                 >
-                    send
+                    <Icon icon="send" />
                 </Button>
             }
         </div>
     )
 }
 
-export default ChatInputForm
+export default MessageInputForm

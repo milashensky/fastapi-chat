@@ -1,4 +1,4 @@
-import { useContext, useState } from "react"
+import { useContext } from "react"
 import { MessageTypeEnum, type ChatMessage } from "~/chat/types"
 import Intersection from "~/ui-kit/intersection"
 import { toLocalIsoDate } from "~/utils/datetime"

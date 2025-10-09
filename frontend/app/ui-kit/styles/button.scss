@@ -10,6 +10,25 @@
         color: var(--button-text-color);
         padding: 4px 12px;
         position: relative;
+        overflow: hidden;
+
+        &.icon {
+            border: none;
+            border-radius: 50%;
+            aspect-ratio: 1 / 1;
+            padding: 0;
+            height: 32px;
+            min-width: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--button-color);
+            background-color: transparent;
+
+            &.secondary {
+                color: var(--button-text-color);
+            }
+        }
 
         &.secondary {
             --button-color: var(--color-white);

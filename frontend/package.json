@@ -11,6 +11,8 @@
         "typecheck": "react-router typegen && tsc"
     },
     "dependencies": {
+        "@fortawesome/fontawesome-free": "^7.1.0",
+        "@fortawesome/react-fontawesome": "^3.1.0",
         "@react-router/node": "^7.9.2",
         "@react-router/serve": "^7.9.2",
         "axios": "^1.12.2",
