@@ -2,10 +2,11 @@ import { NavLink } from "react-router"
 import { useShallow } from "zustand/shallow"
 import { useAuthStore } from "~/auth/auth-store"
 import { useStateRef } from "~/utils/stateRef"
+import { CHAT_BASE_ROUTE } from "~/utils/constants"
 import CreateChatDialog from "./create-chat/create-chat-dialog"
 import { useChatsStore, getChats } from "./chats-store"
 import type { ChatRoom } from "./types"
-import { CHAT_BASE_ROUTE } from "~/utils/constants"
+import './styles/chats-sidebar.scss'
 
 const ChatsSidebar = () => {
     const logout = useAuthStore((state) => state.logout)
@@ -25,6 +26,7 @@ const ChatsSidebar = () => {
                         key={chat.id}
                     >
                         <NavLink
+                            className="nav-item"
                             to={`${CHAT_BASE_ROUTE}/${chat.id}`}
                         >
                             {chat.name}
@@ -32,14 +34,21 @@ const ChatsSidebar = () => {
                     </li>
                 ))}
             </ul>
-            <ul>
+            <div className="flex flex-1" />
+            <ul className="shrink-0">
                 <li>
-                    <a onClick={showCreateDialog}>
+                    <a
+                        className="nav-item"
+                        onClick={showCreateDialog}
+                    >
                         Create chat
                     </a>
                 </li>
                 <li>
-                    <a onClick={logout}>
+                    <a
+                        className="nav-item"
+                        onClick={logout}
+                    >
                         Logout
                     </a>
                 </li>

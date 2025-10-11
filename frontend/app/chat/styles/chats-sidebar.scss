@@ -1,0 +1,43 @@
+@layer components {
+    nav {
+        max-height: 100vh;
+
+        ul {
+            overflow-y: auto;
+            li {
+                display: flex;
+                margin: 8px;
+
+                .nav-item {
+                    --color: var(--text-color);
+                    padding: 8px 16px;
+                    width: 100%;
+                    text-decoration: none;
+                    color: var(--color);
+                    position: relative;
+
+                    &::before {
+                        content: '';
+                        position: absolute;
+                        left: 0;
+                        right: 0;
+                        top: 0;
+                        bottom: 0;
+                        background-color: var(--color);
+                        opacity: 0;
+                        border-radius: var(--radius-md);
+                    }
+
+                    &.active {
+                        --color: var(--color-primary);
+                    }
+
+                    &:hover::before,
+                    &.active::before {
+                        opacity: 0.2;
+                    }
+                }
+            }
+        }
+    }
+}

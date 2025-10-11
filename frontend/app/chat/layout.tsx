@@ -1,7 +1,7 @@
 import { Outlet } from "react-router"
 import ChatsSidebar from "./chats-sidebar"
-import './layout.scss'
 import { useChatsStore } from "./chats-store"
+import './styles/layout.scss'
 
 export const clientLoader = async () => {
     try {
