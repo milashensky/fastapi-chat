@@ -1,6 +1,12 @@
-import { createContext } from "react";
+import { createContext } from 'react'
 
-export const chatRoomContext = createContext({
+
+export interface ChatRoomContext {
+    roomId: number
+    sendMessage: (message: string) => Promise<void>
+}
+
+export const chatRoomContext = createContext<ChatRoomContext>({
     roomId: 0,
-    sendMessage: (message: string) => Promise.resolve(),
+    sendMessage: () => Promise.resolve(),
 })

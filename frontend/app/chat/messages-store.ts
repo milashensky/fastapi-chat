@@ -1,28 +1,29 @@
-import { create } from "zustand"
-import { combine } from "zustand/middleware"
+import { create } from 'zustand'
+import { combine } from 'zustand/middleware'
 import type {
     ChatMessage,
     CreateMessageForm,
     UpdateMessageForm,
-} from "./types"
+} from './types'
 import type {
     IdModelTable,
     Override,
     PaginatedResponse,
     PaginationFilters,
     SearchFilters,
-} from "~/globals/types"
+} from '~/globals/types'
 import {
     useModel,
     type ModelDefenition,
     type ListConfig as BaseListConfig,
     type RequestConfig,
-} from "~/utils/useModel"
-import { asList } from "~/utils/asList"
+} from '~/utils/useModel'
+import { asList } from '~/utils/asList'
+
 
 type MessageId = ChatMessage['id']
 
-interface MessageListRequestOptions extends RequestConfig<ChatMessage, ChatMessage> {
+interface MessageListRequestOptions extends RequestConfig<ChatMessage> {
     roomId: number
 }
 

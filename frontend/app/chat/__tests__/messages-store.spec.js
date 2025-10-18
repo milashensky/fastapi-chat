@@ -3,6 +3,7 @@ import { chatMessageFactory } from '~/test/factories/chatMessage'
 import { paginatedResponseFactory } from '~/test/factories/paginatedResponse'
 import { useMessagesStore } from '../messages-store'
 
+
 vi.mock('axios')
 
 describe('messages-store', () => {

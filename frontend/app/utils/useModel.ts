@@ -1,10 +1,11 @@
-import axios from "axios"
+import axios from 'axios'
+
 
 type Pk = string | number
 
 type RequestOptions = Record<string, unknown>
 
-interface ModelOptions<Item extends unknown, ItemPk = Pk>{
+interface ModelOptions<Item, ItemPk = Pk>{
     baseUrl: string,
     storeItem: (pk: ItemPk, item: Item | null) => void
     deleteItem: (pk: ItemPk) => void
@@ -15,21 +16,21 @@ interface ModelOptions<Item extends unknown, ItemPk = Pk>{
 }
 
 interface ItemRequestConfig<
-    Item extends unknown,
-    ItemResponse extends unknown,
-> extends RequestConfig<Item, ItemResponse> {
+    Item,
+    ItemResponse,
+> extends RequestConfig<ItemResponse> {
     extractItem?: (responseData: ItemResponse) => Item
 }
 
-export interface RequestConfig<Item extends unknown, Response extends unknown> extends RequestOptions {
+export interface RequestConfig<Response> extends RequestOptions {
     handleResponse?: (responseData: Response) => void
 }
 
 export interface ListConfig<
-    Item extends unknown,
-    ListResponse extends unknown,
-    Filters extends unknown,
-> extends RequestConfig<Item, ListResponse> {
+    Item,
+    ListResponse,
+    Filters,
+> extends RequestConfig<ListResponse> {
     filters?: Filters,
     extractItems?: (responseData: ListResponse) => Item[]
 }
@@ -167,7 +168,7 @@ export const useModel = <
             handleResponse(responseData)
             return responseData
         },
-        async delete(itemPk: ItemPk, config: RequestConfig<Item, DeleteResponse> = {}) {
+        async delete(itemPk: ItemPk, config: RequestConfig<DeleteResponse> = {}) {
             const {
                 handleResponse = () => {
                     deleteItem(itemPk)

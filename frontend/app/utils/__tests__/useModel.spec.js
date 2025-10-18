@@ -2,6 +2,7 @@ import axios from 'axios'
 import { userFactory } from '~/test/factories/user'
 import { useModel } from '../useModel'
 
+
 vi.mock('axios')
 
 describe('useModel', () => {

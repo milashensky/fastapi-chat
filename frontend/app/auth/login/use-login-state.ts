@@ -1,8 +1,9 @@
-import { useAuthStore } from "~/auth/auth-store"
-import type { FormErrors } from "~/globals/types"
-import type { LoginCredentials } from "~/auth/types"
-import { BadResponseError } from "~/utils/request"
-import { toValue, useStateRef, type MaybeRef } from "~/utils/stateRef"
+import { useAuthStore } from '~/auth/auth-store'
+import type { FormErrors } from '~/globals/types'
+import type { LoginCredentials } from '~/auth/types'
+import { BadResponseError } from '~/utils/request'
+import { toValue, useStateRef, type MaybeRef } from '~/utils/stateRef'
+
 
 export interface Options {
     email: MaybeRef<string>
@@ -34,11 +35,13 @@ export const useLoginState = (options: Options) => {
                     password: toValue(options.password),
                 })
                 errors.current = {}
-            } catch (e) {
+            }
+            catch (e) {
                 if (e instanceof BadResponseError) {
                     errors.current = e.errors as Errors
                 }
-            } finally {
+            }
+            finally {
                 isPending.current = false
             }
         },

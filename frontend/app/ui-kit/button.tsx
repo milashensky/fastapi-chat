@@ -1,14 +1,15 @@
 import type { GenericProps } from '~/globals/types'
 import { extractDataProps } from '~/utils/extractDataProps'
 
+
 interface Props extends GenericProps {
     className?: string
-    type?: "submit" | "reset" | "button"
+    type?: 'submit' | 'reset' | 'button'
     disabled?: boolean
     icon?: boolean
     onClick?: () => void
     children: React.ReactNode
-    color?: "primary" | "secondary"
+    color?: 'primary' | 'secondary'
 }
 
 export default (props: Props) => {

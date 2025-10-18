@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react"
-import { useShallow } from "zustand/shallow"
-import { getMessages, useMessagesStore } from "~/chat/messages-store"
-import { toValue, type MaybeRef } from "~/utils/stateRef"
-import { MessageTypeEnum } from "../types"
+import { useEffect, useState } from 'react'
+import { useShallow } from 'zustand/shallow'
+import { getMessages, useMessagesStore } from '~/chat/messages-store'
+import { toValue, type MaybeRef } from '~/utils/stateRef'
+import { MessageTypeEnum } from '../types'
+
 
 interface Options {
     roomId: MaybeRef<number>
@@ -45,7 +46,8 @@ export const useRoomMessages = (options: Options) => {
             })
             setCanFetchNext(pageData.next !== null)
             setPage(pageData.page + 1)
-        } finally {
+        }
+        finally {
             setLoading(false)
         }
     }

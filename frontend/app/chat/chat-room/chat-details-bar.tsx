@@ -1,15 +1,16 @@
-import { useContext } from "react"
-import { useShallow } from "zustand/shallow"
+import { useContext } from 'react'
+import { useShallow } from 'zustand/shallow'
 
-import { useChatsStore } from "~/chat/chats-store"
-import { chatRoomContext } from "~/chat/chat-room/chat-room-context"
-import SkeletonLoader from "~/ui-kit/skeleton-loader"
-import Button from "~/ui-kit/button"
-import Icon from "~/ui-kit/icon"
+import { useChatsStore } from '~/chat/chats-store'
+import { chatRoomContext } from '~/chat/chat-room/chat-room-context'
+import SkeletonLoader from '~/ui-kit/skeleton-loader'
+import Button from '~/ui-kit/button'
+import Icon from '~/ui-kit/icon'
 
 import './styles/chat-details-bar.scss'
-import { CHAT_BASE_ROUTE } from "~/utils/constants"
-import { NavLink, Outlet } from "react-router"
+import { CHAT_BASE_ROUTE } from '~/utils/constants'
+import { NavLink } from 'react-router'
+
 
 const ChatDetailsBar = () => {
     const { roomId } = useContext(chatRoomContext)

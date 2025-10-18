@@ -1,8 +1,8 @@
 import {
-    useCallback,
     useEffect,
     useRef,
 } from 'react'
+
 
 interface Options {
     shortcut: string
@@ -17,10 +17,10 @@ export const useKeyboardShortcut = (options: Options) => {
         }
         const key = rawKey.trim().toLowerCase()
         switch (key) {
-            case 'ctrl':
-                return 'control'
-            default:
-                return key
+        case 'ctrl':
+            return 'control'
+        default:
+            return key
         }
     }
     const checkShortcutPressed = (): boolean => {

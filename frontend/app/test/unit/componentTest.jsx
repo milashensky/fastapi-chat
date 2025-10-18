@@ -1,12 +1,13 @@
+/* eslint-disable vitest/valid-title */
 import { render } from '@testing-library/react'
 import { describe } from 'vitest'
 import * as reactRouter from 'react-router'
+
 
 vi.mock('axios')
 vi.mock('zustand')
 
 export const describeComponent = (testName, callback) => describe(testName, () => {
-
     vi.mock('~/ui-kit/dialog', () => ({
         default: (props) => (
             <div data-stub="dialog">

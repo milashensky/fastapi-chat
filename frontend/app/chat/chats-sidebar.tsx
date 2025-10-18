@@ -1,12 +1,13 @@
-import { NavLink } from "react-router"
-import { useShallow } from "zustand/shallow"
-import { useAuthStore } from "~/auth/auth-store"
-import { useStateRef } from "~/utils/stateRef"
-import { CHAT_BASE_ROUTE } from "~/utils/constants"
-import CreateChatDialog from "./create-chat/create-chat-dialog"
-import { useChatsStore, getChats } from "./chats-store"
-import type { ChatRoom } from "./types"
+import { NavLink } from 'react-router'
+import { useShallow } from 'zustand/shallow'
+import { useAuthStore } from '~/auth/auth-store'
+import { useStateRef } from '~/utils/stateRef'
+import { CHAT_BASE_ROUTE } from '~/utils/constants'
+import CreateChatDialog from './create-chat/create-chat-dialog'
+import { useChatsStore, getChats } from './chats-store'
+import type { ChatRoom } from './types'
 import './styles/chats-sidebar.scss'
+
 
 const ChatsSidebar = () => {
     const logout = useAuthStore((state) => state.logout)

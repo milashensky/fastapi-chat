@@ -1,7 +1,8 @@
+import { useEffect, useRef } from 'react'
 import type { GenericProps } from '~/globals/types'
 import { extractDataProps } from '~/utils/extractDataProps'
 import ErrorList from '~/ui-kit/error-list'
-import { useEffect, useRef, useState } from 'react'
+
 
 interface Props extends GenericProps {
     id?: string

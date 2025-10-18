@@ -1,5 +1,6 @@
 import './styles/icon.scss'
 
+
 const iconMap = {
     'close': 'fa-solid fa-xmark',
     'back': 'fa-solid fa-chevron-left',

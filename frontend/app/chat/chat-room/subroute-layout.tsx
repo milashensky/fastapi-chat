@@ -1,17 +1,18 @@
-import { useContext } from "react"
+import { useContext } from 'react'
 import {
     NavLink,
     Outlet,
     useLocation,
     useNavigate,
     useMatches,
-} from "react-router"
-import Card from "~/ui-kit/card"
-import Dialog from "~/ui-kit/dialog"
-import { CHAT_BASE_ROUTE } from "~/utils/constants"
-import { chatRoomContext } from "./chat-room-context"
-import Button from "~/ui-kit/button"
-import Icon from "~/ui-kit/icon"
+} from 'react-router'
+import Card from '~/ui-kit/card'
+import Dialog from '~/ui-kit/dialog'
+import { CHAT_BASE_ROUTE } from '~/utils/constants'
+import { chatRoomContext } from './chat-room-context'
+import Button from '~/ui-kit/button'
+import Icon from '~/ui-kit/icon'
+
 
 interface WithTitle {
     title: string
@@ -19,7 +20,7 @@ interface WithTitle {
 
 const HeaderTitle = () => {
     const matches = useMatches()
-    const current = matches.find(m => (m.handle as WithTitle)?.title)
+    const current = matches.find((m) => (m.handle as WithTitle)?.title)
     const title = (current?.handle as WithTitle)?.title
     return (
         <h2>
@@ -99,21 +100,21 @@ const SubrouteLayout = (props: LayoutProps) => {
     return (
         (
             isMobile
-            ? (
-                isLayout
                 ? (
-                    <MobileLayout />
+                    isLayout
+                        ? (
+                            <MobileLayout />
+                        )
+                        : props.children
                 )
-                : props.children
-            )
-            : (
-                <div className="contents">
-                    <DialogLayout
-                        isShown={isLayout}
-                    />
-                    { props.children }
-                </div>
-            )
+                : (
+                    <div className="contents">
+                        <DialogLayout
+                            isShown={isLayout}
+                        />
+                        { props.children }
+                    </div>
+                )
         )
     )
 }

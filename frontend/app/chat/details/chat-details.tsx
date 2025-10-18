@@ -1,10 +1,11 @@
-import { useContext } from "react"
-import { useShallow } from "zustand/shallow"
-import { useChatsStore } from "~/chat/chats-store"
-import { chatRoomContext } from "~/chat/chat-room/chat-room-context"
-import ChatInviteButton from "~/chat/invite/chat-invite-button"
-import { pluralize } from "~/utils/pluralize"
-import MembersList from "./members-list"
+import { useContext } from 'react'
+import { useShallow } from 'zustand/shallow'
+import { useChatsStore } from '~/chat/chats-store'
+import { chatRoomContext } from '~/chat/chat-room/chat-room-context'
+import ChatInviteButton from '~/chat/invite/chat-invite-button'
+import { pluralize } from '~/utils/pluralize'
+import MembersList from './members-list'
+
 
 export const handle = {
     title: 'Chat details',

@@ -1,8 +1,9 @@
-import { create } from "zustand";
+import { create } from 'zustand'
 import { combine } from 'zustand/middleware'
-import type { IdModelTable } from "~/globals/types";
-import { useModel, type ModelDefenition } from "~/utils/useModel"
-import type { User } from "./types"
+import type { IdModelTable } from '~/globals/types'
+import { useModel, type ModelDefenition } from '~/utils/useModel'
+import type { User } from './types'
+
 
 interface UserDefenition extends ModelDefenition<User> {
     ItemPk: User['id']

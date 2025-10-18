@@ -1,5 +1,8 @@
+/* eslint-disable vitest/valid-describe-callback */
+/* eslint-disable vitest/valid-title */
 import { renderHook } from '@testing-library/react'
 import { describe } from 'vitest'
+
 
 export const describeHook = (testName, callback, { constructor, defaults = {} }) => describe(testName, (options) => {
     const mountHook = (overrides = {}) => {

@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useState } from 'react'
+
 
 export interface StateRef<T> {
     current: T
@@ -44,7 +45,7 @@ export const useStateRef = <T>(initialValue: T): StateRef<T> => {
             current: stateValue,
         },
         {
-            get: <R extends StateRef<T>>(target: R, key: keyof R) => {
+            get: () => {
                 if (typeof stateValue !== 'object') {
                     return stateValue
                 }

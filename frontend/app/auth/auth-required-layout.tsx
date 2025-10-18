@@ -1,6 +1,7 @@
-import { Outlet, useNavigate } from "react-router";
-import { useAuthStore } from "./auth-store";
-import { useEffect } from "react";
+import { Outlet, useNavigate } from 'react-router'
+import { useAuthStore } from './auth-store'
+import { useEffect } from 'react'
+
 
 const Layout = () => {
     const userId = useAuthStore(({ userId }) => userId)

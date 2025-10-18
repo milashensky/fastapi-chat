@@ -1,20 +1,21 @@
-import axios from "axios"
-import { create } from "zustand"
+import axios from 'axios'
+import { create } from 'zustand'
 import { combine } from 'zustand/middleware'
-import type { IdModelTable, Override } from "~/globals/types"
-import { useModel, type ModelDefenition } from "~/utils/useModel"
-import { asList } from "~/utils/asList"
+import type { IdModelTable, Override } from '~/globals/types'
+import { useModel, type ModelDefenition } from '~/utils/useModel'
+import { asList } from '~/utils/asList'
 import type {
     ChatRoom,
     ChatRoomInvite,
     CreateChatForm,
     UpdateChatForm,
-} from "./types"
+} from './types'
 import {
     AlreadyInRoomError,
     InviteExpiredError,
     type AlreadyInRoomDetail,
-} from "./invite-errors"
+} from './invite-errors'
+
 
 type RoomId = ChatRoom['id']
 
@@ -86,7 +87,8 @@ export const useChatsStore = create<ChatsStore>(
                     const { data } = await axios.get<ChatRoom>(`/api/chat/room-invite/${inviteId}`)
                     storeChat(data.id, data)
                     return data
-                } catch (error) {
+                }
+                catch (error) {
                     if (!axios.isAxiosError(error) || !error.response) {
                         throw error
                     }

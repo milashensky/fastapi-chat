@@ -1,9 +1,10 @@
-import { useUser } from "~/auth/use-user"
+import { useUser } from '~/auth/use-user'
 import {
     RoomRoleEnum,
     type RoomRole,
-} from "~/chat/types"
-import SkeletonLoader from "~/ui-kit/skeleton-loader"
+} from '~/chat/types'
+import SkeletonLoader from '~/ui-kit/skeleton-loader'
+
 
 interface Props {
     member: RoomRole,
@@ -19,12 +20,12 @@ const ChatMember = (props: Props) => {
         <div>
             {
                 user
-                ? (
-                    <h5>
-                        {user.name}
-                    </h5>
-                )
-                : <SkeletonLoader />
+                    ? (
+                        <h5>
+                            {user.name}
+                        </h5>
+                    )
+                    : <SkeletonLoader />
             }
             {
                 isAdmin &&

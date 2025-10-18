@@ -2,6 +2,7 @@ import { fireEvent, act } from '@testing-library/react'
 import { describeComponent } from '~/test/unit/componentTest'
 import { useStateRef } from '../stateRef'
 
+
 describeComponent('stateRef', ({ render }) => {
     it('should update component on value change', () => {
         const StubComponent = () => {

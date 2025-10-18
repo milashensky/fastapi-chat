@@ -1,9 +1,10 @@
 import { act, fireEvent } from '@testing-library/react'
 import { useAuthStore } from '~/auth/auth-store'
-import { BadResponseError } from "~/utils/request"
+import { BadResponseError } from '~/utils/request'
 import { describeComponent } from '~/test/unit/componentTest'
 import { manualPromise } from '~/test/unit/manualPromise'
 import Registration from '../registration'
+
 
 vi.mock('zustand')
 

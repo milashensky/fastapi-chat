@@ -1,13 +1,14 @@
-import { create } from "zustand";
+import { create } from 'zustand'
 import type {
     AccessToken,
     LoginCredentials,
     RegistrationForm,
     User,
-} from "./types";
-import axios from "axios";
-import { useUserStore } from "./user-store";
-import { createJSONStorage, persist } from "zustand/middleware";
+} from './types'
+import axios from 'axios'
+import { useUserStore } from './user-store'
+import { createJSONStorage, persist } from 'zustand/middleware'
+
 
 interface CurrentUserResponse {
     user: User

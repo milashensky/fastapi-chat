@@ -1,9 +1,10 @@
-import { describe } from "vitest"
+import { describe } from 'vitest'
 import axios from 'axios'
-import { userFactory } from "~/test/factories/user"
-import { accessTokenFactory } from "~/test/factories/accessToken"
+import { userFactory } from '~/test/factories/user'
+import { accessTokenFactory } from '~/test/factories/accessToken'
 import { useAuthStore } from '../auth-store'
-import { useUserStore } from "../user-store"
+import { useUserStore } from '../user-store'
+
 
 vi.mock('axios')
 

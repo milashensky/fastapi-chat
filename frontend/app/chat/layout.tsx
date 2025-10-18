@@ -1,14 +1,17 @@
-import { Outlet } from "react-router"
-import ChatsSidebar from "./chats-sidebar"
-import { useChatsStore } from "./chats-store"
+import { Outlet } from 'react-router'
+import ChatsSidebar from './chats-sidebar'
+import { useChatsStore } from './chats-store'
 import './styles/layout.scss'
+
 
 export const clientLoader = async () => {
     try {
         const response = await useChatsStore.getState().list()
         return response
-    } catch (e) {
+    }
+    catch (e) {
         // user is not authorized, it's normal
+        console.debug('user is not authorized', e)
         return null
     }
 }

@@ -1,17 +1,18 @@
-import { useRef, useState } from "react"
-import { useNavigate } from "react-router"
-import type { ChatRoom } from "~/chat/types"
-import Dialog from "~/ui-kit/dialog"
-import Button from "~/ui-kit/button"
-import Card from "~/ui-kit/card"
-import Form, { type FormRef } from "~/ui-kit/form"
-import Input from "~/ui-kit/input"
+import { useRef, useState } from 'react'
+import { useNavigate } from 'react-router'
+import type { ChatRoom } from '~/chat/types'
+import Dialog from '~/ui-kit/dialog'
+import Button from '~/ui-kit/button'
+import Card from '~/ui-kit/card'
+import Form, { type FormRef } from '~/ui-kit/form'
+import Input from '~/ui-kit/input'
 import {
     requiredFieldValidator,
     getMinLengthValidator,
-} from "~/utils/validators"
-import { CHAT_BASE_ROUTE, CHAT_NAME_MIN_LENGTH } from "~/utils/constants"
-import { useCreateChat } from "./use-create-chat"
+} from '~/utils/validators'
+import { CHAT_BASE_ROUTE, CHAT_NAME_MIN_LENGTH } from '~/utils/constants'
+import { useCreateChat } from './use-create-chat'
+
 
 interface Props {
     isShown: boolean

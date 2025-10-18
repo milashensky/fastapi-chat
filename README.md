@@ -39,4 +39,5 @@ in `/api/`
 in `/frontend/`
 
 * run `npm run test`
-* run `npm run typecheck`
+* run `npm run eslint`
+* run `npm run types`

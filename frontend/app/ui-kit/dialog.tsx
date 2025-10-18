@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef } from 'react'
 import './styles/dialog.scss'
+
 
 interface Props {
     isShown?: boolean
@@ -54,7 +55,7 @@ const Dialog = (props: Props) => {
     return (
         <dialog
             ref={dialogRef}
-            // @ts-ignore it's actually a valid prop, grow up
+            // @ts-expect-error it's actually a valid prop, grow up
             closedby="any"
         >
             {props.children}

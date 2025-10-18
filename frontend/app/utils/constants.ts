@@ -1,4 +1,5 @@
-import type { DeletedUser } from "~/auth/types"
+import type { DeletedUser } from '~/auth/types'
+
 
 export const DEFAULT_PAGE = '/'
 

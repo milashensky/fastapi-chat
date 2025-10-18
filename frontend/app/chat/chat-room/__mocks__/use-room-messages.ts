@@ -1,5 +1,6 @@
 import { afterEach, vi } from 'vitest'
 
+
 export const fetchNext = vi.fn()
 export const canFetchNext = { current: true }
 export const isLoading = { current: false }

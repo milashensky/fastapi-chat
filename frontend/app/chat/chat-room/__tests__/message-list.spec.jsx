@@ -7,6 +7,7 @@ import { describeComponent } from '~/test/unit/componentTest'
 import MessageList from '../message-list'
 import * as controller from '../use-room-messages'
 
+
 vi.mock('../use-room-messages')
 
 describeComponent('MessageList', ({ render }) => {

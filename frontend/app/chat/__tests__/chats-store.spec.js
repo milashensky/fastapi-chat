@@ -4,6 +4,7 @@ import { chatRoomFactory } from '~/test/factories/chatRoom'
 import { chatRoomInviteFactory } from '~/test/factories/chatRoomInvite'
 import { AlreadyInRoomError, InviteExpiredError } from '~/chat/invite-errors'
 
+
 vi.mock('axios')
 
 describe('ChatsStore', () => {
@@ -64,7 +65,8 @@ describe('ChatsStore', () => {
             await expect(store.acceptChatInvite(inviteId)).rejects.toThrow(message)
             try {
                 await store.acceptChatInvite(inviteId)
-            } catch (error) {
+            }
+            catch (error) {
                 expect(error.chatRoomId).toBe(chatRoomId)
             }
         })

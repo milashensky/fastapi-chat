@@ -1,5 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FormErrors<T extends Record<string, any>> = {
-    [K in keyof T | "__all__"]?: string[]
+    [K in keyof T | '__all__']?: string[]
 }
 
 export type BaseModelTable<K extends string | number, T> = Record<K, T | null>

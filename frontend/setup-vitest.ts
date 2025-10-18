@@ -1,13 +1,14 @@
-import '@testing-library/jest-dom';
-import { cleanup } from '@testing-library/react';
-import { vi, afterEach } from 'vitest';
+import '@testing-library/jest-dom'
+import { cleanup } from '@testing-library/react'
+import { vi, afterEach } from 'vitest'
+
 
 afterEach(() => {
     cleanup()
     vi.clearAllMocks()
     vi.restoreAllMocks()
     vi.unstubAllEnvs()
-});
+})
 
 // Mock window.matchMedia for required components
 Object.defineProperty(window, 'matchMedia', {

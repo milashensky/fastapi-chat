@@ -4,6 +4,7 @@ import { useChatsStore } from '~/chat/chats-store'
 import { describeComponent } from '~/test/unit/componentTest'
 import ChatInviteButton from '../chat-invite-button'
 
+
 vi.mock('zustand')
 
 describeComponent('ChatInviteButton', ({ render }) => {

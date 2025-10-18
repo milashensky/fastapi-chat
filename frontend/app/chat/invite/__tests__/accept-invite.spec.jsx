@@ -6,6 +6,7 @@ import { describeComponent } from '~/test/unit/componentTest'
 import { AlreadyInRoomError, InviteExpiredError } from '~/chat/invite-errors'
 import AcceptInvite, { clientLoader } from '../accept-invite'
 
+
 vi.mock('zustand')
 
 describeComponent('AcceptInvite', ({ render, reactRouter }) => {

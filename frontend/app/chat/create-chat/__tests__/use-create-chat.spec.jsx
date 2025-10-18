@@ -1,11 +1,12 @@
 import { act } from '@testing-library/react'
-import { useChatsStore } from "~/chat/chats-store"
-import { toValue } from "~/utils/stateRef"
-import { BadResponseError } from "~/utils/request"
+import { useChatsStore } from '~/chat/chats-store'
+import { toValue } from '~/utils/stateRef'
+import { BadResponseError } from '~/utils/request'
 import { chatRoomFactory } from '~/test/factories/chatRoom'
 import { describeHook } from '~/test/unit/hookTest'
 import { manualPromise } from '~/test/unit/manualPromise'
 import { useCreateChat } from '../use-create-chat'
+
 
 vi.mock('zustand')
 

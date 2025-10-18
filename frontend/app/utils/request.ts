@@ -1,5 +1,6 @@
-import axios, { type AxiosResponse } from "axios"
-import { useAuthStore } from "~/auth/auth-store"
+import axios, { type AxiosResponse } from 'axios'
+import { useAuthStore } from '~/auth/auth-store'
+
 
 export type ResponseErrors = unknown
 
@@ -22,19 +23,19 @@ export const setupRequest = () => {
     })
     axios.interceptors.response.use(
         (response) => {
-            return response;
+            return response
         },
         (error) => {
             if (!error.response) {
                 return Promise.reject(error)
             }
-            const statusCode = error.response.status;
+            const statusCode = error.response.status
             switch (statusCode) {
-                case 400:
-                    throw new BadResponseError(error.response)
-                case 401:
-                    useAuthStore.getState().logout()
-                    break
+            case 400:
+                throw new BadResponseError(error.response)
+            case 401:
+                useAuthStore.getState().logout()
+                break
             }
             return Promise.reject(error)
         }

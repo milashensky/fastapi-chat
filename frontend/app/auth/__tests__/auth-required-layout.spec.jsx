@@ -3,6 +3,7 @@ import { describeComponent } from '~/test/unit/componentTest'
 import AuthRequiredLayout from '../auth-required-layout'
 import { useAuthStore } from '../auth-store'
 
+
 vi.mock('zustand')
 
 describeComponent('AuthRequiredLayout', ({ render, reactRouter }) => {

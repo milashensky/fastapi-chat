@@ -1,5 +1,6 @@
-import type { RoomRole } from "~/chat/types"
-import ChatMember from "./chat-member"
+import type { RoomRole } from '~/chat/types'
+import ChatMember from './chat-member'
+
 
 interface Props {
     chatMembers: RoomRole[],

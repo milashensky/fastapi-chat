@@ -1,9 +1,10 @@
-import { useState } from "react"
-import type { ChatRoom, CreateChatForm } from "~/chat/types"
-import { useChatsStore } from "~/chat/chats-store"
-import type { FormErrors } from "~/globals/types"
-import { BadResponseError } from "~/utils/request"
-import { toValue, type MaybeRef } from "~/utils/stateRef"
+import { useState } from 'react'
+import type { ChatRoom, CreateChatForm } from '~/chat/types'
+import { useChatsStore } from '~/chat/chats-store'
+import type { FormErrors } from '~/globals/types'
+import { BadResponseError } from '~/utils/request'
+import { toValue, type MaybeRef } from '~/utils/stateRef'
+
 
 interface Options {
     name: MaybeRef<string>
@@ -34,11 +35,13 @@ export const useCreateChat = (options: Options) => {
                     name: toValue(options.name),
                 })
                 actions.onSuccess(chat)
-            } catch (e) {
+            }
+            catch (e) {
                 if (e instanceof BadResponseError) {
                     setErrors(e.errors as ResponseErrors)
                 }
-            } finally {
+            }
+            finally {
                 setPending(false)
             }
         },

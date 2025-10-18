@@ -4,8 +4,9 @@ import {
     useEffect,
     useImperativeHandle,
     useRef,
-} from "react"
-import { useStateRef } from "~/utils/stateRef"
+} from 'react'
+import { useStateRef } from '~/utils/stateRef'
+
 
 export type Validator = () => boolean
 
@@ -54,7 +55,7 @@ export const useFormValidator = <T,>(options: ValidatorOptions<T>) => {
     useEffect(() => {
         formContext.registerValidator(validateField)
         return () => formContext.unregisterValidator(validateField)
-    }, [validateField, formContext.registerValidator, formContext.unregisterValidator]);
+    }, [validateField, formContext.registerValidator, formContext.unregisterValidator])
     return {
         errors,
         validateField,
@@ -72,7 +73,7 @@ export default (props: Props) => {
     }
     useImperativeHandle(props.ref, () => ({
         validate,
-    }), [props.ref]);
+    }), [props.ref])
     const handleSubmit = (event: React.SyntheticEvent<HTMLFormElement>) => {
         event.preventDefault()
         if (props.onSubmit) {

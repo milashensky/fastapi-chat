@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker'
 import { MessageTypeEnum } from '~/chat/types'
 
+
 export const chatMessageFactory = (overrides = {}) => ({
     'id': faker.number.int(),
     'content': faker.lorem.paragraph(),

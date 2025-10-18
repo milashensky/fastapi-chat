@@ -4,6 +4,7 @@ import UnauthenticatedLayout from '../unauthenticated-layout'
 import { useAuthStore } from '../auth-store'
 import { DEFAULT_PAGE } from '~/utils/constants'
 
+
 vi.mock('zustand')
 
 describeComponent('UnauthenticatedLayout', ({ render, reactRouter }) => {
@@ -28,13 +29,13 @@ describeComponent('UnauthenticatedLayout', ({ render, reactRouter }) => {
     it('should support next query param', async () => {
         const next = '/somebody/once/told/me'
         const url = new URL(`http://localhost/?next=${next}`)
-         Object.defineProperty(window, "location", {
+        Object.defineProperty(window, 'location', {
             writable: true,
             value: {
                 ...window.location,
                 search: url.search,
             },
-        });
+        })
         useAuthStore.setState({ userId: 0 })
         render(<UnauthenticatedLayout />)
         expect(navigateMock).toHaveBeenCalledWith(next, { replace: true })

@@ -1,6 +1,7 @@
-import type { ChatMessage } from "~/chat/types"
+import type { ChatMessage } from '~/chat/types'
 
 import './styles/system-message.scss'
+
 
 interface Props {
     message: ChatMessage

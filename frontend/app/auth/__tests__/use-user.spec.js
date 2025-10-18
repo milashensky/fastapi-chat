@@ -1,9 +1,10 @@
-import { useUserStore } from "~/auth/user-store"
+import { useUserStore } from '~/auth/user-store'
 import { userFactory } from '~/test/factories/user'
 import { describeHook } from '~/test/unit/hookTest'
-import { DELETED_USER } from "~/utils/constants"
+import { DELETED_USER } from '~/utils/constants'
 
 import { useUser } from '../use-user'
+
 
 describeHook('useUser', ({ mountHook }) => {
     const user = userFactory()

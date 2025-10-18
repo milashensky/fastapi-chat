@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker'
 
+
 export const accessTokenFactory = (overrides = {}) => ({
     token: faker.internet.jwt(),
     token_type: 'Bearer',

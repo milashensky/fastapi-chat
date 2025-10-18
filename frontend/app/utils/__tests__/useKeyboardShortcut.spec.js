@@ -2,6 +2,7 @@ import { act, fireEvent } from '@testing-library/react'
 import { describeHook } from '~/test/unit/hookTest'
 import { useKeyboardShortcut } from '../useKeyboardShortcut'
 
+
 describeHook('useKeyboardShortcut', ({ mountHook }) => {
     it('should trigger callback if shortcut is pressed', () => {
         const callback = vi.fn()
@@ -12,8 +13,8 @@ describeHook('useKeyboardShortcut', ({ mountHook }) => {
         expect(callback).not.toHaveBeenCalled()
         act(() => {
             fireEvent.keyDown(window, {
-                key: "a",
-                code: "KeyA",
+                key: 'a',
+                code: 'KeyA',
                 keyCode: 65,
                 charCode: 65,
             })
@@ -30,14 +31,14 @@ describeHook('useKeyboardShortcut', ({ mountHook }) => {
         expect(callback).not.toHaveBeenCalled()
         act(() => {
             fireEvent.keyDown(window, {
-                key: "a",
-                code: "KeyA",
+                key: 'a',
+                code: 'KeyA',
                 keyCode: 65,
                 charCode: 65,
             })
             fireEvent.keyDown(window, {
-                key: "Control",
-                code: "ControlLeft",
+                key: 'Control',
+                code: 'ControlLeft',
                 keyCode: 17,
                 charCode: 17,
             })
@@ -53,20 +54,20 @@ describeHook('useKeyboardShortcut', ({ mountHook }) => {
         })
         act(() => {
             fireEvent.keyDown(window, {
-                key: "a",
-                code: "KeyA",
+                key: 'a',
+                code: 'KeyA',
                 keyCode: 65,
                 charCode: 65,
             })
             fireEvent.keyDown(window, {
-                key: "Alt",
-                code: "KeyAlt",
+                key: 'Alt',
+                code: 'KeyAlt',
                 keyCode: 18,
                 charCode: 18,
             })
             fireEvent.keyDown(window, {
-                key: "ControlLeft",
-                code: "Control",
+                key: 'ControlLeft',
+                code: 'Control',
                 keyCode: 17,
                 charCode: 17,
             })
@@ -82,20 +83,20 @@ describeHook('useKeyboardShortcut', ({ mountHook }) => {
         })
         act(() => {
             fireEvent.keyDown(window, {
-                key: "a",
-                code: "KeyA",
+                key: 'a',
+                code: 'KeyA',
                 keyCode: 65,
                 charCode: 65,
             })
             fireEvent.keyUp(window, {
-                key: "a",
-                code: "KeyA",
+                key: 'a',
+                code: 'KeyA',
                 keyCode: 65,
                 charCode: 65,
             })
             fireEvent.keyDown(window, {
-                key: "ControlLeft",
-                code: "Control",
+                key: 'ControlLeft',
+                code: 'Control',
                 keyCode: 17,
                 charCode: 17,
             })
@@ -112,8 +113,8 @@ describeHook('useKeyboardShortcut', ({ mountHook }) => {
         hook.unmount()
         act(() => {
             fireEvent.keyDown(window, {
-                key: "a",
-                code: "KeyA",
+                key: 'a',
+                code: 'KeyA',
                 keyCode: 65,
                 charCode: 65,
             })

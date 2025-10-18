@@ -1,9 +1,10 @@
-import { useAuthStore } from "~/auth/auth-store"
-import type { ChatMessage } from "~/chat/types"
-import { formatTime } from "~/utils/datetime"
+import { useAuthStore } from '~/auth/auth-store'
+import type { ChatMessage } from '~/chat/types'
+import { formatTime } from '~/utils/datetime'
 
-import MessageAuthor from "./message-author"
+import MessageAuthor from './message-author'
 import './styles/message.scss'
+
 
 interface Props {
     message: ChatMessage

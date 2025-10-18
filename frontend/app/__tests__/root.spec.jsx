@@ -3,6 +3,7 @@ import { describeComponent } from '~/test/unit/componentTest'
 import { accessTokenFactory } from '~/test/factories/accessToken'
 import App from '../root'
 
+
 vi.mock('zustand')
 
 describeComponent('App', ({ render }) => {

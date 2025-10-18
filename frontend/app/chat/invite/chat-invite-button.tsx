@@ -1,7 +1,8 @@
-import { useState } from "react"
-import Button from "~/ui-kit/button"
-import { CHAT_INVITE_BASE_ROUTE } from "~/utils/constants"
-import { useChatsStore } from "../chats-store"
+import { useState } from 'react'
+import Button from '~/ui-kit/button'
+import { CHAT_INVITE_BASE_ROUTE } from '~/utils/constants'
+import { useChatsStore } from '../chats-store'
+
 
 interface Props {
     roomId: number
@@ -17,7 +18,8 @@ const ChatInviteButton = ({ roomId }: Props) => {
             const link = `${window.location.origin}${CHAT_INVITE_BASE_ROUTE}/${invite.id}`
             window.navigator.clipboard.writeText(link)
             // TODO: alert
-        } finally {
+        }
+        finally {
             setPending(false)
         }
     }

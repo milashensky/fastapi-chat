@@ -1,5 +1,6 @@
-import { useUser } from "~/auth/use-user"
-import SkeletonLoader from "~/ui-kit/skeleton-loader"
+import { useUser } from '~/auth/use-user'
+import SkeletonLoader from '~/ui-kit/skeleton-loader'
+
 
 interface Props {
     userId: number | null
@@ -11,14 +12,14 @@ const MessageAuthor = ({ userId }: Props)=> {
         <div className="message-author">
             {
                 !user
-                ? (
-                    <SkeletonLoader />
-                )
-                : (
-                    <b>
-                        { user.name }
-                    </b>
-                )
+                    ? (
+                        <SkeletonLoader />
+                    )
+                    : (
+                        <b>
+                            { user.name }
+                        </b>
+                    )
             }
         </div>
     )

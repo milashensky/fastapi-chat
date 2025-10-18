@@ -1,5 +1,6 @@
 import { defaultDict } from '../defaultDict'
 
+
 describe('defaultDict', () => {
     it('should automatically create fist value for key', () => {
         const value = defaultDict(() => [])

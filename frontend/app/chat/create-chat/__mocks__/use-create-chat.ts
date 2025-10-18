@@ -1,4 +1,5 @@
-import { afterEach, vi } from "vitest"
+import { afterEach, vi } from 'vitest'
+
 
 export const validate = vi.fn()
 export const onSuccess = vi.fn()

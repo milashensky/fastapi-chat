@@ -1,4 +1,5 @@
-import type { GenericProps } from "~/globals/types"
+import type { GenericProps } from '~/globals/types'
+
 
 export const extractDataProps = <T extends GenericProps>(props: T): GenericProps => {
     const dataProps = Object.fromEntries(

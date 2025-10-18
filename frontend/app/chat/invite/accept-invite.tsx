@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react"
-import { useNavigate } from "react-router"
-import { useChatsStore } from "../chats-store"
-import { CHAT_BASE_ROUTE } from "~/utils/constants"
-import type { Route } from "./+types/accept-invite"
-import { AlreadyInRoomError, InviteExpiredError } from "~/chat/invite-errors"
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router'
+import { useChatsStore } from '../chats-store'
+import { CHAT_BASE_ROUTE } from '~/utils/constants'
+import type { Route } from './+types/accept-invite'
+import { AlreadyInRoomError, InviteExpiredError } from '~/chat/invite-errors'
+
 
 interface Props {
     loaderData: {
@@ -35,7 +36,8 @@ const AcceptInvite = (props: Props) => {
         try {
             const chatRoom = await acceptChatInvite(inviteId)
             navigateToRoom(chatRoom.id)
-        } catch (e) {
+        }
+        catch (e) {
             if (e instanceof AlreadyInRoomError) {
                 navigateToRoom(e.chatRoomId)
                 return
@@ -44,7 +46,8 @@ const AcceptInvite = (props: Props) => {
                 setExpired(true)
                 return
             }
-        } finally {
+        }
+        finally {
             setPending(false)
         }
     }

@@ -1,10 +1,11 @@
-import { useMessagesStore } from "~/chat/messages-store"
-import type { Route } from "../+types/layout"
-import { chatRoomContext } from "./chat-room-context"
-import MessageList from "./message-list"
-import MessageInputForm from "./message-input-form"
-import ChatDetailsBar from "./chat-details-bar"
-import SubrouteLayout from "./subroute-layout"
+import { useMessagesStore } from '~/chat/messages-store'
+import type { Route } from '../+types/layout'
+import { chatRoomContext } from './chat-room-context'
+import MessageList from './message-list'
+import MessageInputForm from './message-input-form'
+import ChatDetailsBar from './chat-details-bar'
+import SubrouteLayout from './subroute-layout'
+
 
 interface Props {
     loaderData: {

@@ -1,8 +1,9 @@
-import { useEffect } from "react"
-import { useShallow } from "zustand/shallow"
-import { useUserStore } from "~/auth/user-store"
-import type { User, DeletedUser } from "./types"
-import { DELETED_USER } from "~/utils/constants"
+import { useEffect } from 'react'
+import { useShallow } from 'zustand/shallow'
+import { useUserStore } from '~/auth/user-store'
+import type { User, DeletedUser } from './types'
+import { DELETED_USER } from '~/utils/constants'
+
 
 interface Options {
     userId: User['id'] | null

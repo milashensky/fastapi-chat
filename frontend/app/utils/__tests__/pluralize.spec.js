@@ -1,5 +1,6 @@
 import { pluralize } from '../pluralize'
 
+
 describe('pluralize', () => {
     it.each([
         {

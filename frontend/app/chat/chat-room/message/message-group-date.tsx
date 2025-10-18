@@ -1,5 +1,6 @@
 import './styles/message-group-date.scss'
-import { formatDateRelative } from "~/utils/datetime"
+import { formatDateRelative } from '~/utils/datetime'
+
 
 interface Props {
     date: string

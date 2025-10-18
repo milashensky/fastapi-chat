@@ -1,7 +1,8 @@
-import { Outlet, useNavigate, useSearchParams } from "react-router";
-import { useAuthStore } from "./auth-store";
-import { useEffect } from "react";
-import { DEFAULT_PAGE } from "~/utils/constants";
+import { Outlet, useNavigate, useSearchParams } from 'react-router'
+import { useAuthStore } from './auth-store'
+import { useEffect } from 'react'
+import { DEFAULT_PAGE } from '~/utils/constants'
+
 
 const Layout = () => {
     const [searchParams] = useSearchParams()
