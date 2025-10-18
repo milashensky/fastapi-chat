@@ -1,10 +1,12 @@
 import { useContext } from 'react'
 import { useShallow } from 'zustand/shallow'
 import { useChatsStore } from '~/chat/chats-store'
-import Icon from '~/ui-kit/icon'
+import ChatRoleRequired from '~/chat/access/chat-role-required'
 import { chatRoomContext } from '~/chat/chat-room/chat-room-context'
 import ChatInviteButton from '~/chat/invite/chat-invite-button'
+import { RoomRoleEnum } from '~/chat/types'
 import { pluralize } from '~/utils/pluralize'
+import Icon from '~/ui-kit/icon'
 import MembersList from './members-list'
 import './styles/chat-details.scss'
 
@@ -35,10 +37,14 @@ const ChatDetails = () => {
             <MembersList
                 chatMembers={chat.roles}
             />
-            {/* todo: rbac */}
-            <ChatInviteButton
+            <ChatRoleRequired
                 roomId={roomId}
-            />
+                allowFor={[RoomRoleEnum.ADMIN, RoomRoleEnum.MODERATOR]}
+            >
+                <ChatInviteButton
+                    roomId={roomId}
+                />
+            </ChatRoleRequired>
         </div>
     )
 }

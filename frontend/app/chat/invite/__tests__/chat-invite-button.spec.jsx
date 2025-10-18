@@ -1,4 +1,4 @@
-import { fireEvent } from '@testing-library/react'
+import { act, fireEvent } from '@testing-library/react'
 import flushPromises from 'flush-promises'
 import { useChatsStore } from '~/chat/chats-store'
 import { describeComponent } from '~/test/unit/componentTest'
@@ -23,6 +23,9 @@ describeComponent('ChatInviteButton', ({ render }) => {
                 origin: 'http://localhost:3000',
             },
         })
+        Object.defineProperty(window, 'alert', {
+            value: vi.fn(),
+        })
     })
 
     it('should create invite and copy link to clipboard when clicked', async () => {
@@ -35,8 +38,10 @@ describeComponent('ChatInviteButton', ({ render }) => {
         const props = { roomId }
         const component = render(<ChatInviteButton {...props} />)
         const button = component.getByText('Invite more people')
-        fireEvent.click(button)
-        await flushPromises()
+        await act(async () => {
+            fireEvent.click(button)
+            await flushPromises()
+        })
         expect(createChatInviteMock).toHaveBeenCalledWith(roomId)
         expect(clipboardMock.writeText).toHaveBeenCalledWith(`http://localhost:3000/invite/${inviteId}`)
     })
