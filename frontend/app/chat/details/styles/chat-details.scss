@@ -1,0 +1,8 @@
+@layer components {
+    .chat-members-heading {
+        text-transform: uppercase;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+}

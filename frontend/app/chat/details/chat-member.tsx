@@ -4,6 +4,7 @@ import {
     type RoomRole,
 } from '~/chat/types'
 import SkeletonLoader from '~/ui-kit/skeleton-loader'
+import './styles/chat-member.scss'
 
 
 interface Props {
@@ -17,11 +18,11 @@ const ChatMember = (props: Props) => {
     const isAdmin = (member.role === RoomRoleEnum.ADMIN)
     const isModerator = (member.role === RoomRoleEnum.MODERATOR)
     return (
-        <div>
+        <div className="chat-member">
             {
                 user
                     ? (
-                        <h5>
+                        <h5 className="chat-member-name">
                             {user.name}
                         </h5>
                     )
@@ -29,13 +30,13 @@ const ChatMember = (props: Props) => {
             }
             {
                 isAdmin &&
-                <small>
+                <small className="chat-member-role">
                     Admin
                 </small>
             }
             {
                 isModerator &&
-                <small>
+                <small className="chat-member-role">
                     Moderator
                 </small>
             }

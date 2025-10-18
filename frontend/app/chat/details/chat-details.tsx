@@ -1,10 +1,12 @@
 import { useContext } from 'react'
 import { useShallow } from 'zustand/shallow'
 import { useChatsStore } from '~/chat/chats-store'
+import Icon from '~/ui-kit/icon'
 import { chatRoomContext } from '~/chat/chat-room/chat-room-context'
 import ChatInviteButton from '~/chat/invite/chat-invite-button'
 import { pluralize } from '~/utils/pluralize'
 import MembersList from './members-list'
+import './styles/chat-details.scss'
 
 
 export const handle = {
@@ -24,9 +26,12 @@ const ChatDetails = () => {
             <h4>
                 { chat.name }
             </h4>
-            <p>
+            <b className="chat-members-heading">
+                <Icon
+                    icon="members"
+                />
                 { chat.roles.length } {pluralize('Member', chat.roles.length)}
-            </p>
+            </b>
             <MembersList
                 chatMembers={chat.roles}
             />

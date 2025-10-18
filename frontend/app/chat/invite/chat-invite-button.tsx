@@ -17,7 +17,8 @@ const ChatInviteButton = ({ roomId }: Props) => {
             const invite = await createChatInvite(roomId)
             const link = `${window.location.origin}${CHAT_INVITE_BASE_ROUTE}/${invite.id}`
             window.navigator.clipboard.writeText(link)
-            // TODO: alert
+            window.alert('Invite link is copied!')
+            // TODO: alert toast
         }
         finally {
             setPending(false)

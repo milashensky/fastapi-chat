@@ -1,0 +1,15 @@
+@layer components {
+    .chat-member {
+        display: flex;
+        flex-direction: column;
+        padding: 8px 2px;
+
+        &-name {
+            margin: 0;
+        }
+
+        &-role {
+            color: var(--color-primary);
+        }
+    }
+}

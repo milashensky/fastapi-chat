@@ -7,6 +7,7 @@ const iconMap = {
     'send': 'fa-solid fa-paper-plane rotate-45',
     'vertical-ellipsis': 'fa-solid fa-ellipsis-vertical',
     'search': 'fa-solid fa-magnifying-glass',
+    'members': 'fa-solid fa-users',
 } as const
 
 interface Props {

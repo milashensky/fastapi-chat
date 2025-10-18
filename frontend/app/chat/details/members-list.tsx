@@ -7,10 +7,11 @@ interface Props {
 }
 const MembersList = (props: Props) => {
     return (
-        <div>
+        <div className="py-2">
             {
                 props.chatMembers.map((member) => (
                     <ChatMember
+                        key={member.id}
                         member={member}
                     />
                 ))
