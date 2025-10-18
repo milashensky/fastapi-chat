@@ -3,12 +3,12 @@ from typing import Annotated
 from fastapi import Depends, HTTPException
 from sqlmodel import select
 
-from auth.authorizers import require_authentication, require_superuser
+from auth.authorizers import require_authentication
 from auth.authorization import generate_user_access_token, get_is_authenticated
 from auth.models import User
 from auth.password import hash_password, verify_password
 from auth.schemas import CreateUserForm, LoginForm, LoginUserResponse, PublicUser
-from db import SessionDep, get_session
+from db import SessionDep
 from utils.base_view import BaseApi
 from utils.exceptions import ValidationError
 from utils.response import JsonResponse

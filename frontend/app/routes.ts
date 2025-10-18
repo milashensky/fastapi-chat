@@ -16,6 +16,7 @@ export default [
                 route("details", './chat/details/chat-details.tsx'),
             ]),
             index("routes/home.tsx"),
-        ])
+        ]),
+        route('invite/:inviteId', './chat/invite/accept-invite.tsx'),
     ])
 ] satisfies RouteConfig;

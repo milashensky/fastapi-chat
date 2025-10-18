@@ -203,7 +203,10 @@ async def accept_invite_api(
     )
     room_role = db_session.exec(role_query).first()
     if room_role:
-        raise HTTPException(412, 'Already in the room')
+        raise HTTPException(412, {
+            'message': 'Already in the room',
+            'chat_room_id': room_role.chat_room_id,
+        })
     new_role = RoomRole(
         user_id=current_user.id,
         chat_room_id=chat_room.id,

@@ -647,6 +647,11 @@ class ChatInviteApiTestCase(ChatApiTestCase):
         with self.subTest('should not add a user already has role'):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 412)
+            response_data = response.json()
+            self.assertEqual(
+                response_data['detail'].get('chat_room_id'),
+                invite.chat_room_id,
+            )
         invite = RoomInviteFactory(
             expires_at='2024-12-12T12:30:00',
         )

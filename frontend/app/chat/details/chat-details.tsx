@@ -1,13 +1,14 @@
 import { useContext } from "react"
 import { useShallow } from "zustand/shallow"
-import { chatRoomContext } from "~/chat/chat-room/chat-room-context"
 import { useChatsStore } from "~/chat/chats-store"
+import { chatRoomContext } from "~/chat/chat-room/chat-room-context"
+import ChatInviteButton from "~/chat/invite/chat-invite-button"
 import { pluralize } from "~/utils/pluralize"
+import MembersList from "./members-list"
 
 export const handle = {
     title: 'Chat details',
 }
-
 
 const ChatDetails = () => {
     const { roomId } = useContext(chatRoomContext)
@@ -25,6 +26,13 @@ const ChatDetails = () => {
             <p>
                 { chat.roles.length } {pluralize('Member', chat.roles.length)}
             </p>
+            <MembersList
+                chatMembers={chat.roles}
+            />
+            {/* todo: rbac */}
+            <ChatInviteButton
+                roomId={roomId}
+            />
         </div>
     )
 }

@@ -1,14 +1,20 @@
-import { create } from "zustand";
+import axios from "axios"
+import { create } from "zustand"
 import { combine } from 'zustand/middleware'
+import type { IdModelTable, Override } from "~/globals/types"
 import { useModel, type ModelDefenition } from "~/utils/useModel"
-import type { IdModelTable, Override } from "~/globals/types";
+import { asList } from "~/utils/asList"
 import type {
     ChatRoom,
+    ChatRoomInvite,
     CreateChatForm,
     UpdateChatForm,
 } from "./types"
-import { excludeNullish } from "~/utils/excludeNullish"
-import { asList } from "~/utils/asList";
+import {
+    AlreadyInRoomError,
+    InviteExpiredError,
+    type AlreadyInRoomDetail,
+} from "./invite-errors"
 
 type RoomId = ChatRoom['id']
 
@@ -22,6 +28,8 @@ export interface ChatsStore {
     list: () => Promise<ChatRoom[]>
     update: (chatId: RoomId, body: UpdateChatForm) => Promise<ChatRoom>
     deleteChat: (chatId: RoomId) => Promise<null>
+    createChatInvite: (chatId: RoomId) => Promise<ChatRoomInvite>
+    acceptChatInvite: (inviteId: ChatRoomInvite['id']) => Promise<ChatRoom>
 }
 
 type ChatsDefenition = Override<ModelDefenition<ChatRoom>, {
@@ -69,6 +77,29 @@ export const useChatsStore = create<ChatsStore>(
                     return chatRooms[chatId]
                 },
             })
+            const createChatInvite = async (roomId: RoomId) => {
+                const response = await axios.post<ChatRoomInvite>(`/api/chat/rooms/${roomId}/invite`)
+                return response.data
+            }
+            const acceptChatInvite = async (inviteId: ChatRoomInvite['id']) => {
+                try {
+                    const { data } = await axios.get<ChatRoom>(`/api/chat/room-invite/${inviteId}`)
+                    storeChat(data.id, data)
+                    return data
+                } catch (error) {
+                    if (!axios.isAxiosError(error) || !error.response) {
+                        throw error
+                    }
+                    if (error.response.status === 412) {
+                        const detail = error.response.data?.detail as AlreadyInRoomDetail
+                        throw new AlreadyInRoomError(detail.message, detail.chat_room_id)
+                    }
+                    if (error.response.status === 410) {
+                        throw new InviteExpiredError('Invite is expired')
+                    }
+                    throw error
+                }
+            }
             return {
                 getOrFetch,
                 fetch,
@@ -78,6 +109,8 @@ export const useChatsStore = create<ChatsStore>(
                 deleteChat,
                 storeChat,
                 unstoreChat,
+                createChatInvite,
+                acceptChatInvite,
             }
         },
     ),
