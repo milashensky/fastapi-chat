@@ -5,6 +5,7 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    field_validator,
 )
 from pydantic_partial import create_partial_model
 
@@ -33,7 +34,20 @@ class PublicChatRoom(BaseModel):
 
 
 class CreateRoomBody(BaseModel):
-    name: str = Field(min_length=3)
+    name: str = Field()
+
+    @field_validator('name')
+    @classmethod
+    def validate_name(cls, name):
+        """validates max and min length. not min(max)_length for custom errors and partial support
+        """
+        if name is None:
+            return name
+        if len(name) < 3:
+            raise ValueError('Must be at least 3 characters long')
+        if len(name) > 127:
+            raise ValueError('Max length 127 characters long')
+        return name
 
 
 ChatRoomUpdate = create_partial_model(CreateRoomBody)

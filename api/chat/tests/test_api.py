@@ -1,4 +1,6 @@
 from unittest.mock import ANY
+
+from faker import Faker
 from freezegun import freeze_time
 from sqlmodel import delete, select
 from sqlalchemy.orm import selectinload
@@ -20,6 +22,9 @@ from chat.tests.factories import (
     RoomInviteFactory,
 )
 from utils.test_matchers import AnyOrderedArray
+
+
+fake = Faker()
 
 
 def serialize_role(role):
@@ -192,6 +197,15 @@ class ChatRoomsApiTestCase(ChatApiTestCase):
             response = self.client.patch(url, json=body)
             response_data = response.json()
             self.assertEqual(response.status_code, 200, response_data)
+        with self.subTest('should validate name length'):
+            old_name = self.chat_room.name
+            response = self.client.patch(url, json={
+                'name': fake.sentence(200),
+            })
+            response_data = response.json()
+            self.assertEqual(response.status_code, 400)
+            self.db_session.refresh(self.chat_room)
+            self.assertEqual(self.chat_room.name, old_name)
         new_user = UserFactory()
         created_at = self.chat_room.created_at
         body = {

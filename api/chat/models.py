@@ -2,8 +2,16 @@ import datetime
 import enum
 from typing import TYPE_CHECKING, Optional
 import uuid
-from sqlalchemy import Column, DateTime
-from sqlmodel import Enum, Field, SQLModel, Relationship, UniqueConstraint
+from sqlalchemy import String
+from sqlmodel import (
+    Enum,
+    Field,
+    SQLModel,
+    Relationship,
+    UniqueConstraint,
+    Column,
+    DateTime,
+)
 
 from conf import settings
 from utils.models import TimestampsMixin
@@ -16,7 +24,14 @@ class ChatRoom(TimestampsMixin, SQLModel, table=True):
     __tablename__ = 'chat_room'
 
     id: int | None = Field(default=None, primary_key=True)
-    name: str = Field(index=True)
+    name: str = Field(
+        max_length=127,
+        sa_column=Column(
+            String(127),
+            index=True,
+            nullable=False,
+        ),
+    )
     created_by_id: int | None = Field(
         default=None,
         foreign_key='auth_users.id',
