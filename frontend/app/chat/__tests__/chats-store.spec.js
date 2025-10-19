@@ -1,8 +1,9 @@
 import axios from 'axios'
-import { useChatsStore } from '../chats-store'
+import { AlreadyInRoomError, InviteExpiredError } from '~/chat/invite-errors'
 import { chatRoomFactory } from '~/test/factories/chatRoom'
 import { chatRoomInviteFactory } from '~/test/factories/chatRoomInvite'
-import { AlreadyInRoomError, InviteExpiredError } from '~/chat/invite-errors'
+import { roomRoleFactory } from '~/test/factories/roomRole'
+import { useChatsStore } from '../chats-store'
 
 
 vi.mock('axios')
@@ -98,6 +99,100 @@ describe('ChatsStore', () => {
             axios.isAxiosError.mockReturnValue(true)
             const store = useChatsStore.getState()
             await expect(store.acceptChatInvite(inviteId)).rejects.toBe(errorResponse)
+        })
+    })
+
+    describe('room roles', () => {
+        const roomId = '123'
+        const role1 = roomRoleFactory({
+            id: 1,
+            chat_room_id: roomId,
+            role: 'user',
+        })
+        const role2 = roomRoleFactory({
+            id: 2,
+            chat_room_id: roomId,
+        })
+        const chat1 = chatRoomFactory({
+            id: roomId,
+            roles: [role1, role2],
+        })
+        const chat2 = chatRoomFactory()
+
+        describe('storeRoomRole', () => {
+            const roleUpdate = roomRoleFactory({
+                id: 1,
+                chat_room_id: roomId,
+                role: 'admin',
+            })
+
+            it('should store role for a chat', () => {
+                useChatsStore.setState({
+                    chatRooms: {
+                        [chat1.id]: chat1,
+                        [chat2.id]: chat2,
+                    },
+                })
+                const store = useChatsStore.getState()
+                store.storeRoomRole(roleUpdate.id, roleUpdate)
+                expect(useChatsStore.getState().chatRooms).toStrictEqual({
+                    [chat1.id]: {
+                        ...chat1,
+                        roles: [roleUpdate, role2],
+                    },
+                    [chat2.id]: chat2,
+                })
+            })
+
+            it('should not store a role if chat room is not stored yet', () => {
+                useChatsStore.setState({
+                    chatRooms: {
+                        [chat2.id]: chat2,
+                    },
+                })
+                const store = useChatsStore.getState()
+                store.storeRoomRole(roleUpdate.id, roleUpdate)
+                expect(useChatsStore.getState().chatRooms).toStrictEqual({
+                    [chat2.id]: chat2,
+                })
+            })
+        })
+
+        describe('unstoreRoomRole', () => {
+            it('should remove a role for a chat', () => {
+                useChatsStore.setState({
+                    chatRooms: {
+                        [chat1.id]: chat1,
+                        [chat2.id]: chat2,
+                        [-1]: null,
+                    },
+                })
+                const store = useChatsStore.getState()
+                store.unstoreRoomRole(role1.id)
+                expect(useChatsStore.getState().chatRooms).toStrictEqual({
+                    [chat1.id]: {
+                        ...chat1,
+                        roles: [role2],
+                    },
+                    [chat2.id]: chat2,
+                    [-1]: null,
+                })
+            })
+
+            it('should not remove a role if chat room is not stored yet', () => {
+                useChatsStore.setState({
+                    chatRooms: {
+                        [chat2.id]: chat2,
+                        [-1]: null,
+                    },
+                })
+                const store = useChatsStore.getState()
+                store.unstoreRoomRole(role1.id)
+                expect(useChatsStore.getState().chatRooms).toStrictEqual({
+                    [chat2.id]: chat2,
+                    [-1]: null,
+                })
+            })
         })
     })
 })

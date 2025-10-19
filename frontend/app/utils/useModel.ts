@@ -1,7 +1,9 @@
 import axios from 'axios'
 
 
-type Pk = string | number
+type PkBase = string | number | symbol
+
+type Pk<T extends PkBase = number> = T
 
 type RequestOptions = Record<string, unknown>
 
@@ -44,26 +46,26 @@ export class ModelSetupError extends Error {
 
 interface DefaultDefenition {
     ItemPk: Pk
-    ListFilters: unknown,
-    ListResponse: unknown,
-    FetchResponse: unknown,
-    CreateItemBody: unknown,
-    CreateResponse: unknown,
-    UpdateItemBody: unknown,
-    UpdateResponse: unknown,
-    DeleteResponse: unknown,
+    ListFilters: unknown
+    ListResponse: unknown
+    FetchResponse: unknown
+    CreateItemBody: unknown
+    CreateResponse: unknown
+    UpdateItemBody: unknown
+    UpdateResponse: unknown
+    DeleteResponse: unknown
 }
 
 export interface ModelDefenition<Item>{
     ItemPk: Pk
-    ListFilters: unknown,
-    ListResponse: Item[],
-    FetchResponse: Item,
-    CreateItemBody: Omit<Item, 'id'>,
-    CreateResponse: Item,
-    UpdateItemBody: Partial<Item>,
-    UpdateResponse: Item,
-    DeleteResponse: null,
+    ListFilters: unknown
+    ListResponse: Item[]
+    FetchResponse: Item
+    CreateItemBody: Omit<Item, 'id'>
+    CreateResponse: Item
+    UpdateItemBody: Partial<Item>
+    UpdateResponse: Item
+    DeleteResponse: null
 }
 
 export const useModel = <

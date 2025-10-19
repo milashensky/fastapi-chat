@@ -41,6 +41,7 @@ const EditRoleForm = (props: Props) => {
     }
     const {
         submit,
+        errors,
         isPending,
     } = useRoleEdit({
         roomRoleId: member.id,
@@ -66,8 +67,10 @@ const EditRoleForm = (props: Props) => {
                 <Select
                     placeholder="Select role"
                     name="role"
+                    data-testid="role-select"
                     disabled={isPending}
                     value={role}
+                    errors={errors.role}
                     options={roleOptions}
                     onChange={(value) => setRole(value)}
                 />
@@ -76,6 +79,7 @@ const EditRoleForm = (props: Props) => {
                 <Button
                     icon
                     disabled={isPending}
+                    data-testid="submit"
                     type="submit"
                 >
                     <Icon
@@ -84,7 +88,9 @@ const EditRoleForm = (props: Props) => {
                 </Button>
                 <Button
                     icon
+                    type="reset"
                     color="secondary"
+                    data-testid="reset"
                     disabled={isPending}
                     onClick={onBack}
                 >

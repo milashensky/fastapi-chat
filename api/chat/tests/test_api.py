@@ -513,6 +513,14 @@ class RoomRoleApiTestCase(ChatApiTestCase):
                 response.json(),
                 serialize_role(room_role),
             )
+        with self.subTest('should not allow to set empty role'):
+            old_room_role = room_role.role
+            response = self.client.patch(url, json={
+                'role': None
+            })
+            self.assertEqual(response.status_code, 400)
+            self.db_session.refresh(room_role)
+            self.assertEqual(room_role.role, old_room_role)
         role_user = room_role.user
         body = {
             'chat_room_id': -1,
@@ -520,7 +528,6 @@ class RoomRoleApiTestCase(ChatApiTestCase):
         }
         with self.subTest('should not edit other fields'):
             response = self.client.patch(url, json=body)
-            self.assertEqual(response.status_code, 200)
             self.db_session.refresh(room_role)
             self.assertEqual(room_role.user, role_user)
             self.assertEqual(room_role.chat_room, self.chat_room)

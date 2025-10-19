@@ -2,6 +2,8 @@ import type { GenericProps } from '~/globals/types'
 import { extractDataProps } from '~/utils/extractDataProps'
 
 
+export type ButtonColor = 'primary' | 'secondary' | 'danger'
+
 interface Props extends GenericProps {
     className?: string
     type?: 'submit' | 'reset' | 'button'
@@ -9,7 +11,7 @@ interface Props extends GenericProps {
     icon?: boolean
     onClick?: () => void
     children: React.ReactNode
-    color?: 'primary' | 'secondary' | 'danger'
+    color?: ButtonColor
 }
 
 export default (props: Props) => {

@@ -23,6 +23,10 @@ export interface CreateChatForm {
 
 export type UpdateChatForm = Partial<CreateChatForm>
 
+export type UpdateRoomRoleForm = {
+    role?: RoomRoleEnum
+}
+
 export enum MessageTypeEnum {
     TEXT = 'text',
     SYSTEM_ANNOUNCEMENT = 'system_announcement',

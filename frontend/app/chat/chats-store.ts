@@ -8,16 +8,20 @@ import type {
     ChatRoom,
     ChatRoomInvite,
     CreateChatForm,
+    RoomRole,
     UpdateChatForm,
+    UpdateRoomRoleForm,
 } from './types'
 import {
     AlreadyInRoomError,
     InviteExpiredError,
     type AlreadyInRoomDetail,
 } from './invite-errors'
+import { toMap } from '~/utils/toMap'
 
 
 type RoomId = ChatRoom['id']
+type RoomRoleId = RoomRole['id']
 
 export interface ChatsStore {
     chatRooms: IdModelTable<ChatRoom>
@@ -31,6 +35,10 @@ export interface ChatsStore {
     deleteChat: (chatId: RoomId) => Promise<null>
     createChatInvite: (chatId: RoomId) => Promise<ChatRoomInvite>
     acceptChatInvite: (inviteId: ChatRoomInvite['id']) => Promise<ChatRoom>
+    storeRoomRole: (roleId: RoomRoleId, role: RoomRole | null) => void
+    unstoreRoomRole: (roleId: RoomRoleId) => void
+    updateRoomRole: (roleId: RoomRoleId, role: UpdateRoomRoleForm) => Promise<RoomRole>
+    deleteRoomRole: (roleId: RoomRoleId) => Promise<null>
 }
 
 type ChatsDefenition = Override<ModelDefenition<ChatRoom>, {
@@ -102,6 +110,48 @@ export const useChatsStore = create<ChatsStore>(
                     throw error
                 }
             }
+            const storeRoomRole = (roleId: RoomRoleId, role: RoomRole | null) => {
+                if (!role) {
+                    return
+                }
+                const { chatRooms } = get()
+                const room = chatRooms[role.chat_room_id]
+                if (!room) {
+                    return
+                }
+                const roomRoles = toMap(room.roles, 'id')
+                roomRoles[roleId] = role
+                storeChat(role.chat_room_id, {
+                    ...room,
+                    roles: Object.values(roomRoles),
+                })
+            }
+            const unstoreRoomRole = (roleId: RoomRoleId) => {
+                const { chatRooms } = get()
+                const roomsEntries = Object.entries(chatRooms)
+                const updatedRooms = roomsEntries.map(([roomId, room]) => {
+                    if (!room) {
+                        return [roomId, room]
+                    }
+                    const updatedRoles = room.roles.filter(({ id }) => id !== roleId)
+                    const updatedRoom = {
+                        ...room,
+                        roles: updatedRoles,
+                    }
+                    return [roomId, updatedRoom]
+                })
+                set({
+                    chatRooms: Object.fromEntries(updatedRooms),
+                })
+            }
+            const {
+                update: updateRoomRole,
+                delete: deleteRoomRole,
+            } = useModel<RoomRole>({
+                baseUrl: '/api/chat/room-role',
+                storeItem: storeRoomRole,
+                deleteItem: unstoreRoomRole,
+            })
             return {
                 getOrFetch,
                 fetch,
@@ -113,6 +163,10 @@ export const useChatsStore = create<ChatsStore>(
                 unstoreChat,
                 createChatInvite,
                 acceptChatInvite,
+                storeRoomRole,
+                unstoreRoomRole,
+                updateRoomRole,
+                deleteRoomRole,
             }
         },
     ),

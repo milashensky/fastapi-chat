@@ -21,7 +21,7 @@ class PublicRoomRole(BaseModel):
 
 
 class RoomRoleUpdateBody(BaseModel):
-    role: Optional[RoomRoleEnum] = None
+    role: RoomRoleEnum
 
 
 class PublicChatRoom(BaseModel):

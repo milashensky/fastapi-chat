@@ -3,7 +3,7 @@ import { useChatsStore } from '~/chat/chats-store'
 import { RoomRoleEnum } from '~/chat/types'
 import { describeComponent } from '~/test/unit/componentTest'
 import { chatRoomFactory } from '~/test/factories/chatRoom'
-import { chatRoleFactory } from '~/test/factories/chatRole'
+import { roomRoleFactory } from '~/test/factories/roomRole'
 import ChatRoleRequired from '../chat-role-required'
 
 
@@ -34,7 +34,7 @@ describeComponent('ChatRoleRequired', ({ render }) => {
                 [roomId]: chatRoomFactory({
                     id: roomId,
                     roles: [
-                        chatRoleFactory({
+                        roomRoleFactory({
                             user_id: userId,
                             chat_room_id: roomId,
                             role: userRole,
@@ -83,7 +83,7 @@ describeComponent('ChatRoleRequired', ({ render }) => {
                 [roomId]: chatRoomFactory({
                     id: roomId,
                     roles: [
-                        chatRoleFactory({
+                        roomRoleFactory({
                             user_id: userId,
                             chat_room_id: roomId,
                             role: userRole,
@@ -115,7 +115,7 @@ describeComponent('ChatRoleRequired', ({ render }) => {
                 [roomId]: chatRoomFactory({
                     id: roomId,
                     roles: [
-                        chatRoleFactory({
+                        roomRoleFactory({
                             id: 999,
                         }),
                     ],
@@ -162,7 +162,7 @@ describeComponent('ChatRoleRequired', ({ render }) => {
                 [roomId]: chatRoomFactory({
                     id: roomId,
                     roles: [
-                        chatRoleFactory({
+                        roomRoleFactory({
                             user_id: userId,
                             chat_room_id: roomId,
                             role: RoomRoleEnum.ADMIN,

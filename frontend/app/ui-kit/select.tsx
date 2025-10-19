@@ -1,5 +1,10 @@
 import type { GenericProps } from '~/globals/types'
 import { extractDataProps } from '~/utils/extractDataProps'
+import ErrorList from './error-list'
+import {
+    useFormValidator,
+    type FieldValidator
+} from './form'
 import './styles/select.scss'
 
 
@@ -16,7 +21,9 @@ interface Props <T> extends GenericProps {
     placeholder?: string
     label?: string
     options?: Option<T>[]
+    errors?: string[]
     children?: React.ReactNode
+    rules?: FieldValidator<T>[]
     onChange?: (value: T) => void
 }
 
@@ -27,15 +34,18 @@ const Select = <T extends string | number>(props: Props<T>) => {
         placeholder,
         options = []
     } = props
-    const handleChange = (event: React.ChangeEvent) => {
+    const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         if (!onChange) {
             return
         }
-        const value = event.currentTarget.nodeValue
+        const value = event.target.value
         onChange(value as T)
     }
-    const optionNodes = options.map((option) => (
-        <option value={option.value}>
+    const optionNodes = options.map((option, index) => (
+        <option
+            key={index}
+            value={option.value}
+        >
             {option.label}
         </option>
     ))
@@ -50,6 +60,16 @@ const Select = <T extends string | number>(props: Props<T>) => {
             )
             : null
     )
+    const {
+        errors,
+    } = useFormValidator({
+        value: props.value,
+        rules: props.rules,
+    })
+    const allErrors = [
+        ...errors.current,
+        ...props.errors ?? [],
+    ]
     return (
         <label>
             {props.label}
@@ -65,6 +85,7 @@ const Select = <T extends string | number>(props: Props<T>) => {
                 {optionNodes}
                 {props.children}
             </select>
+            <ErrorList errors={allErrors} />
         </label>
     )
 }
