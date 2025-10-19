@@ -12,7 +12,10 @@ import SystemMessage from './message/system-message'
 
 
 const MessageList = () => {
-    const { roomId } = useContext(chatRoomContext)
+    const {
+        roomId,
+        search,
+    } = useContext(chatRoomContext)
     const {
         isLoading,
         messages,
@@ -20,6 +23,7 @@ const MessageList = () => {
         fetchNext,
     } = useRoomMessages({
         roomId,
+        search,
     })
 
     const combineMessages = (messages: ChatMessage[]): React.ReactNode[]=> {

@@ -19,6 +19,8 @@ export const useKeyboardShortcut = (options: Options) => {
         switch (key) {
         case 'ctrl':
             return 'control'
+        case 'esc':
+            return 'escape'
         default:
             return key
         }

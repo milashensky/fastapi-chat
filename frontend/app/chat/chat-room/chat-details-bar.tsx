@@ -1,19 +1,24 @@
 import { useContext } from 'react'
+import { NavLink } from 'react-router'
 import { useShallow } from 'zustand/shallow'
 
 import { useChatsStore } from '~/chat/chats-store'
-import { chatRoomContext } from '~/chat/chat-room/chat-room-context'
+import { chatRoomContext, ChatRoomStateEnum } from '~/chat/chat-room/chat-room-context'
 import SkeletonLoader from '~/ui-kit/skeleton-loader'
 import Button from '~/ui-kit/button'
 import Icon from '~/ui-kit/icon'
-
-import './styles/chat-details-bar.scss'
 import { CHAT_BASE_ROUTE } from '~/utils/constants'
-import { NavLink } from 'react-router'
+
+import ChatSearchBar from './chat-search-bar'
+import './styles/chat-details-bar.scss'
 
 
 const ChatDetailsBar = () => {
-    const { roomId } = useContext(chatRoomContext)
+    const {
+        roomId,
+        state,
+        setState,
+    } = useContext(chatRoomContext)
     const room = useChatsStore(useShallow((state) => state.chatRooms[roomId]))
     if (!room) {
         return (
@@ -21,6 +26,9 @@ const ChatDetailsBar = () => {
                 <SkeletonLoader />
             </div>
         )
+    }
+    if (state === ChatRoomStateEnum.SEARCH) {
+        return <ChatSearchBar />
     }
     return (
         <div className="chat-room-top-bar">
@@ -36,6 +44,7 @@ const ChatDetailsBar = () => {
             <Button
                 icon
                 color="secondary"
+                onClick={() => setState(ChatRoomStateEnum.SEARCH)}
             >
                 <Icon icon="search" />
             </Button>
