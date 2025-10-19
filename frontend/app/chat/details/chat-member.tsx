@@ -26,6 +26,8 @@ const ChatMember = (props: Props) => {
     })
     const isAdmin = (member.role === RoomRoleEnum.ADMIN)
     const isModerator = (member.role === RoomRoleEnum.MODERATOR)
+    const currentUserId = useAuthStore((state) => state.userId)
+    const isCurrentUser = (member.user_id === currentUserId)
     if (isEdit) {
         return (
             <EditRoleForm
@@ -34,8 +36,6 @@ const ChatMember = (props: Props) => {
             />
         )
     }
-    const currentUserId = useAuthStore((state) => state.userId)
-    const isCurrentUser = (member.user_id === currentUserId)
     return (
         <div className="flex justify-between items-center">
             <div className="chat-member">
