@@ -8,6 +8,7 @@ import { RoomRoleEnum } from '~/chat/types'
 import { pluralize } from '~/utils/pluralize'
 import Icon from '~/ui-kit/icon'
 import MembersList from './members-list'
+import LeaveChatButton from './leave-chat-button'
 import './styles/chat-details.scss'
 
 
@@ -24,7 +25,7 @@ const ChatDetails = () => {
         )
     }
     return (
-        <div>
+        <div className="flex flex-col gap-2">
             <h4>
                 { chat.name }
             </h4>
@@ -41,10 +42,13 @@ const ChatDetails = () => {
                 roomId={roomId}
                 allowFor={[RoomRoleEnum.ADMIN, RoomRoleEnum.MODERATOR]}
             >
-                <ChatInviteButton
-                    roomId={roomId}
-                />
+                <div>
+                    <ChatInviteButton
+                        roomId={roomId}
+                    />
+                </div>
             </ChatRoleRequired>
+            <LeaveChatButton />
         </div>
     )
 }

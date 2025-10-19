@@ -10,6 +10,8 @@ export const TOKEN_REFRESH_THRESHOLD_MS = 5 * 60 * 1000
 
 export const CHAT_BASE_ROUTE = '/chat'
 
+export const ROOT_ROUTE = '/'
+
 export const CHAT_INVITE_BASE_ROUTE = '/invite'
 
 export const DELETED_USER: DeletedUser = {
