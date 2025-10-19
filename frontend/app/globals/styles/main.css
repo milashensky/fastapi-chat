@@ -2,6 +2,8 @@
 @import '@fortawesome/fontawesome-free/css/all.min.css';
 
 @theme {
+    --color-primary: var(--color-primary);
+    --color-message-list: var(--message-list-color);
     --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
         "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }

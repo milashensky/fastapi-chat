@@ -68,8 +68,19 @@ const MessageList = () => {
         return combinedMessages
     }
     const combinedMessages = combineMessages(messages)
+    const isEmpty = (!isLoading && !canFetchNext && !messages.length)
     return (
         <div className="message-list">
+            {
+                isEmpty
+                && (
+                    <div className="flex flex-1 h-full justify-center items-center">
+                        <b>
+                            No messages yet
+                        </b>
+                    </div>
+                )
+            }
             <div
                 className="message-list-container"
                 data-testid="container"
