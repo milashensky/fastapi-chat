@@ -44,9 +44,9 @@ class CreateRoomBody(BaseModel):
         if name is None:
             return name
         if len(name) < 3:
-            raise ValueError('Must be at least 3 characters long')
+            raise ValueError('Must be at least 3 characters long.')
         if len(name) > 127:
-            raise ValueError('Max length 127 characters long')
+            raise ValueError('Max length 127 characters.')
         return name
 
 
