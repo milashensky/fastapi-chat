@@ -8,6 +8,9 @@ const iconMap = {
     'vertical-ellipsis': 'fa-solid fa-ellipsis-vertical',
     'search': 'fa-solid fa-magnifying-glass',
     'members': 'fa-solid fa-users',
+    'delete': 'fa-solid fa-trash',
+    'edit': 'fa-solid fa-pencil',
+    'accept': 'fa-solid fa-check',
 } as const
 
 interface Props {

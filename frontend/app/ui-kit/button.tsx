@@ -9,7 +9,7 @@ interface Props extends GenericProps {
     icon?: boolean
     onClick?: () => void
     children: React.ReactNode
-    color?: 'primary' | 'secondary'
+    color?: 'primary' | 'secondary' | 'danger'
 }
 
 export default (props: Props) => {

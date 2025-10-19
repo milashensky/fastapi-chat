@@ -67,9 +67,11 @@ export const DialogLayout = ({ isShown }: DialogProps) => {
         <Dialog
             isShown={isShown}
             onHide={goBack}
-            max-width={400}
         >
-            <Card>
+            <Card
+                className="w-screen"
+                maxWidth={400}
+            >
                 <div className="flex gap-4 justify-between">
                     <HeaderTitle />
                     <Button

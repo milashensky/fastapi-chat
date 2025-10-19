@@ -3,6 +3,7 @@
         --button-color: var(--color-primary);
         --button-text-color: var(--color-white);
         --button-border-color: var(--button-color);
+        --outline-color: var(--button-color);
 
         background-color: var(--button-color);
         border: 1px solid var(--button-border-color);
@@ -35,6 +36,10 @@
             --button-color: var(--color-white);
             --button-text-color: var(--text-color);
             --button-border-color: var(--border-color);
+            --outline-color: var(--button-text-color);
+        }
+        &.danger {
+            --button-color: var(--color-danger);
         }
 
         &:after {
@@ -71,7 +76,7 @@
             }
 
             &:focus {
-                outline: solid var(--button-color);
+                outline: solid var(--outline-color);
             }
         }
     }

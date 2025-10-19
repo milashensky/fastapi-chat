@@ -3,10 +3,11 @@
     --color-white: white;
     --color-black: #1a1a1a;
     --color-gray: gray;
+    --color-danger: red;
 
     --border-color: #CBD2D0;
-    --error-border-color: red;
-    --error-text-color: red;
+    --error-border-color: var(--color-danger);
+    --error-text-color: var(--color-danger);
     --disabled-color: #E8E9F3;
     --backdrop-color: var(--color-gray);
     --backdrop-opacity: 0.3;

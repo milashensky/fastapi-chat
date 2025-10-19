@@ -29,7 +29,8 @@ export const useKeyboardShortcut = (options: Options) => {
         if (cleanedPressed.length !== cleanedShortcut.length) {
             return false
         }
-        return cleanedPressed.every((key) => cleanedShortcut.includes(key))
+        const isPressed = cleanedPressed.every((key) => cleanedShortcut.includes(key))
+        return isPressed
     }
     const handleKeyDown = (event: KeyboardEvent) => {
         pressedKeys.current.push(event.key)
@@ -40,13 +41,17 @@ export const useKeyboardShortcut = (options: Options) => {
     const handleKeyUp = (event: KeyboardEvent) => {
         pressedKeys.current = pressedKeys.current.filter((key) => key !== event.key)
     }
-
+    const handleBlur = () => {
+        pressedKeys.current = []
+    }
     useEffect(() => {
         window.addEventListener('keydown', handleKeyDown)
         window.addEventListener('keyup', handleKeyUp)
+        window.addEventListener('blur', handleBlur)
         return () => {
             window.removeEventListener('keydown', handleKeyDown)
-            window.addEventListener('keyup', handleKeyUp)
+            window.removeEventListener('keyup', handleKeyUp)
+            window.removeEventListener('blur', handleBlur)
         }
     }, [handleKeyDown])
 }
