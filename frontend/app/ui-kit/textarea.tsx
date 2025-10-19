@@ -1,13 +1,18 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useImperativeHandle, useRef, type Ref } from 'react'
 import type { GenericProps } from '~/globals/types'
 import { extractDataProps } from '~/utils/extractDataProps'
 import ErrorList from '~/ui-kit/error-list'
 
 
+export interface TextareaRef {
+    focus: () => void
+}
+
 interface Props extends GenericProps {
     id?: string
     className?: string
     autoGrow?: boolean
+    ref?: Ref<TextareaRef>
     name?: string
     value?: string
     label?: string
@@ -22,6 +27,16 @@ interface Props extends GenericProps {
 
 export default (props: Props) => {
     const elRef = useRef<HTMLTextAreaElement>(null)
+    const focus = () => {
+        const element = elRef.current
+        if (!element) {
+            return
+        }
+        element.focus()
+    }
+    useImperativeHandle(props.ref, () => ({
+        focus,
+    }), [props.ref])
     useEffect(() => {
         if (!props.autoGrow) {
             return

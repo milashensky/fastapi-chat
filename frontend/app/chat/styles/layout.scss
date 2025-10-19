@@ -28,6 +28,7 @@
         @include mixins.sm {
             scroll-snap-type: x mandatory;
             overflow-x: auto;
+            scroll-behavior: smooth;
 
             nav,
             main {
