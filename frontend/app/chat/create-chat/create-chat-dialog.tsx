@@ -70,6 +70,7 @@ const CreateChatDialog = (props: Props) => {
                         rules={[requiredFieldValidator, chatNameLengthValidator]}
                         type="text"
                         label="Name"
+                        name="chat-name"
                         data-testid="name"
                         placeholder="Enter a name for new chat"
                     />

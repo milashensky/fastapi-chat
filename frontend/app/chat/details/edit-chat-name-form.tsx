@@ -51,7 +51,7 @@ const EditChatNameForm = (props: Props) => {
             <div className="flex flex-col flex">
                 <Input
                     placeholder="Enter new name for this chat"
-                    name="name"
+                    name="chat-name"
                     data-testid="name-input"
                     disabled={isPending}
                     rules={[requiredFieldValidator, chatNameLengthValidator]}
