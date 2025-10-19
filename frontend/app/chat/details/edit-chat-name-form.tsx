@@ -1,39 +1,30 @@
 import { useRef, useState } from 'react'
-import { useUser } from '~/auth/use-user'
-import { RoomRoleEnum, type RoomRole } from '~/chat/types'
+import { type ChatRoom } from '~/chat/types'
 import Button from '~/ui-kit/button'
 import Form, { type FormRef } from '~/ui-kit/form'
 import Icon from '~/ui-kit/icon'
-import Select from '~/ui-kit/select'
-import { useRoleEdit } from './use-role-edit'
+import Input from '~/ui-kit/input'
+import {
+    getMinLengthValidator,
+    requiredFieldValidator,
+} from '~/utils/validators'
+import { CHAT_NAME_MIN_LENGTH } from '~/utils/constants'
+import { useChatEdit } from './use-chat-edit'
 
 
 interface Props {
-    member: RoomRole
     onBack: () => void
+    chat: ChatRoom
 }
 
-const roleOptions = [
-    {
-        value: RoomRoleEnum.USER,
-        label: 'User',
-    },
-    {
-        value: RoomRoleEnum.MODERATOR,
-        label: 'Moderator',
-    },
-    {
-        value: RoomRoleEnum.ADMIN,
-        label: 'Admin',
-    },
-]
+const chatNameLengthValidator = getMinLengthValidator(CHAT_NAME_MIN_LENGTH)
 
-const EditRoleForm = (props: Props) => {
+const EditChatNameForm = (props: Props) => {
     const {
         onBack,
-        member,
+        chat,
     } = props
-    const [role, setRole] = useState<RoomRoleEnum>(member.role)
+    const [name, setName] = useState(chat.name)
     const formRef = useRef<FormRef>(null)
     const validate = (): boolean => {
         const isValid = formRef.current?.validate()
@@ -43,16 +34,13 @@ const EditRoleForm = (props: Props) => {
         submit,
         errors,
         isPending,
-    } = useRoleEdit({
-        roomRoleId: member.id,
-        role,
+    } = useChatEdit({
+        roomId: chat.id,
+        form: { name },
         actions: {
             onSuccess: onBack,
             validate,
         },
-    })
-    const user = useUser({
-        userId: member.user_id,
     })
     return (
         <Form
@@ -61,18 +49,15 @@ const EditRoleForm = (props: Props) => {
             onSubmit={submit}
         >
             <div className="flex flex-col flex">
-                <p>
-                    {user?.name}
-                </p>
-                <Select
-                    placeholder="Select role"
-                    name="role"
-                    data-testid="role-select"
+                <Input
+                    placeholder="Enter new name for this chat"
+                    name="name"
+                    data-testid="name-input"
                     disabled={isPending}
-                    value={role}
-                    errors={errors.role}
-                    options={roleOptions}
-                    onChange={setRole}
+                    rules={[requiredFieldValidator, chatNameLengthValidator]}
+                    value={name}
+                    errors={errors.name}
+                    onInput={setName}
                 />
             </div>
             <div className="flex gap-2">
@@ -103,4 +88,4 @@ const EditRoleForm = (props: Props) => {
     )
 }
 
-export default EditRoleForm
+export default EditChatNameForm

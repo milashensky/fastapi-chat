@@ -9,6 +9,8 @@ import { pluralize } from '~/utils/pluralize'
 import Icon from '~/ui-kit/icon'
 import MembersList from './members-list'
 import LeaveChatButton from './leave-chat-button'
+import DeleteChatButton from './delete-chat-button'
+import ChatTitle from './chat-title'
 import './styles/chat-details.scss'
 
 
@@ -26,9 +28,9 @@ const ChatDetails = () => {
     }
     return (
         <div className="flex flex-col gap-2">
-            <h4>
-                { chat.name }
-            </h4>
+            <ChatTitle
+                chat={chat}
+            />
             <b className="chat-members-heading">
                 <Icon
                     icon="members"
@@ -49,6 +51,12 @@ const ChatDetails = () => {
                 </div>
             </ChatRoleRequired>
             <LeaveChatButton />
+            <ChatRoleRequired
+                roomId={roomId}
+                allowFor={[RoomRoleEnum.ADMIN]}
+            >
+                <DeleteChatButton />
+            </ChatRoleRequired>
         </div>
     )
 }
