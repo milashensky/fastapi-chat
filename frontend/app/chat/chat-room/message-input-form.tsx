@@ -15,8 +15,20 @@ import './styles/chat-input-form.scss'
 const MessageInputForm = () => {
     const [message, setMessage] = useState('')
     const context = useContext(chatRoomContext)
+    const { editingMessage, setEditingMessageId } = context
+    const isEditing = editingMessage !== null
+    useEffect(() => {
+        if (editingMessage) {
+            setMessage(editingMessage.content)
+            return
+        }
+        setMessage('')
+    }, [editingMessage])
+    const cancelEdit = () => {
+        setEditingMessageId(null)
+    }
     const cleanedMessage = message.trim()
-    const sendMessage = async () => {
+    const submitMessage = async () => {
         if (!cleanedMessage) {
             return
         }
@@ -27,32 +39,39 @@ const MessageInputForm = () => {
     useEffect(() => {
         const element = textareaRef.current
         element?.focus()
-    }, [context.roomId])
+    }, [context.roomId, editingMessage])
     useKeyboardShortcut({
         shortcut: 'ctrl+enter',
-        callback: sendMessage,
+        callback: submitMessage,
     })
+    useKeyboardShortcut({
+        shortcut: 'escape',
+        callback: cancelEdit,
+    })
+    const placeholder = isEditing ? 'Edit your message...' : 'Write a message...'
     return (
         <div className="message-input-container">
             <Textarea
                 ref={textareaRef}
                 autoGrow
                 autoFocus
-                placeholder="Write a message..."
+                placeholder={placeholder}
                 className="message-input"
                 value={message}
                 name="message"
                 onInput={setMessage}
             />
             {
-                cleanedMessage &&
-                <Button
-                    className="message-send"
-                    icon
-                    onClick={sendMessage}
-                >
-                    <Icon icon="send" />
-                </Button>
+                cleanedMessage && (
+                    <Button
+                        className="message-send"
+                        icon
+                        onClick={submitMessage}
+                        data-testid={isEditing ? 'save-edit-button' : 'send-message-button'}
+                    >
+                        <Icon icon={isEditing ? 'accept' : 'send'} />
+                    </Button>
+                )
             }
         </div>
     )

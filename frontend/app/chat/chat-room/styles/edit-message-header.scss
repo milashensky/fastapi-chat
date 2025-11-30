@@ -1,0 +1,19 @@
+@layer components {
+    .message-edit-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--border-color);
+        gap: 12px;
+
+        .message-edit-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .message-edit-label {
+            font-weight: 500;
+        }
+    }
+}

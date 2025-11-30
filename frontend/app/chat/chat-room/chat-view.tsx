@@ -1,8 +1,11 @@
-import { useState } from 'react'
-import { useMessagesStore } from '~/chat/messages-store'
-import { chatRoomContext, ChatRoomStateEnum } from './chat-room-context'
+import {
+    chatRoomContext,
+    useChatRoomContext,
+    ChatRoomStateEnum,
+} from './chat-room-context'
 import MessageList from './message-list'
 import MessageInputForm from './message-input-form'
+import EditMessageHeader from './edit-message-header'
 import ChatDetailsBar from './chat-details-bar'
 import SubrouteLayout from './subroute-layout'
 import type { Route } from '../+types/layout'
@@ -22,27 +25,9 @@ export async function clientLoader(args: Route.ClientLoaderArgs) {
 }
 
 const ChatView = (props: Props) => {
-    const createMessage = useMessagesStore((state) => state.create)
-    const [search, setSearch] = useState('')
-    const [state, setState] = useState(ChatRoomStateEnum.MESSAGE)
-    const {
-        roomId,
-    } = props.loaderData
-    const sendMessage = async (message: string) => {
-        await createMessage({
-            content: message,
-        }, {
-            roomId,
-        })
-    }
-    const context = {
-        roomId,
-        state,
-        setState,
-        search,
-        setSearch,
-        sendMessage,
-    }
+    const { roomId } = props.loaderData
+    const context = useChatRoomContext({ roomId })
+    const { state, editingMessage } = context
     return (
         <chatRoomContext.Provider
             value={context}
@@ -54,8 +39,12 @@ const ChatView = (props: Props) => {
                         <MessageList />
                     </div>
                     {
-                        (state !== ChatRoomStateEnum.SEARCH) &&
-                        <MessageInputForm />
+                        (state !== ChatRoomStateEnum.SEARCH) && (
+                            <div className="message-input-area">
+                                {editingMessage && <EditMessageHeader />}
+                                <MessageInputForm />
+                            </div>
+                        )
                     }
                 </div>
             </SubrouteLayout>

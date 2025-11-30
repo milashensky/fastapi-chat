@@ -9,6 +9,7 @@ export const chatMessageFactory = (overrides = {}) => ({
     'chat_room_id': faker.number.int(),
     'created_by_id': faker.number.int(),
     'created_at': faker.date.past().toISOString(),
+    'updated_at': null,
     ...overrides,
 })
 
