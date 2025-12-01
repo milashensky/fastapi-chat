@@ -3,7 +3,7 @@ import datetime
 from typing import Annotated, List
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, WebSocket
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import desc, select
 
 from auth.authorization import get_current_user
@@ -28,7 +28,7 @@ from chat.schemas import (
     PublicMessage,
     RoomRoleUpdateBody,
 )
-from chat.websocket import manager, WebSocketEventType
+from websocket.manager import manager, WebSocketEventType
 from conf import settings
 from db import SessionDep
 from utils.pagination import paginate_response, pagination_dep
@@ -420,24 +420,3 @@ async def delete_room_role_api(
         content=PublicMessage.model_validate(exit_message).model_dump(mode='json'),
     )
     return None
-
-
-@chat_router.websocket('/ws', name='chat:websocket')
-async def websocket_endpoint(websocket: WebSocket, token: str | None = None):
-    from auth.authorization import authenticate_token, CredentialValidationException
-    from chat.websocket import manager
-    from starlette.websockets import WebSocketDisconnect
-    if not token:
-        await websocket.close(code=4003)
-        return
-    try:
-        user = await authenticate_token(token)
-    except CredentialValidationException:
-        await websocket.close(code=4003)
-        return
-    await manager.connect(websocket, user.id)
-    try:
-        while True:
-            await websocket.receive_text()
-    except WebSocketDisconnect:
-        manager.disconnect(websocket, user.id)

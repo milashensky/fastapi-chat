@@ -11,3 +11,4 @@ SQLAlchemy==2.0.43
 SQLAlchemy-Utils==0.42.0
 freezegun==1.5.5
 pydantic-partial==0.10.1
+websockets==15.0.1

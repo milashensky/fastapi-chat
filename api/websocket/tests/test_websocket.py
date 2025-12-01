@@ -2,14 +2,14 @@ from starlette.websockets import WebSocketDisconnect
 
 from auth.tests.factories import UserFactory
 from chat.tests.base import ChatApiTestCase
-from chat.tests.factories import MessageFactory, RoomInviteFactory
-from chat.websocket import manager
+from chat.tests.factories import MessageFactory, RoomRoleFactory, RoomInviteFactory
+from websocket.manager import manager
 from utils.base_tests import ApiTestClient
 
 
 class WebSocketTestCase(ChatApiTestCase):
     def get_ws_url(self, token=None):
-        url = self.app.url_path_for('chat:websocket')
+        url = self.app.url_path_for('websocket:connect')
         if token:
             return f'{url}?token={token}'
         return url
@@ -60,7 +60,6 @@ class WebSocketTestCase(ChatApiTestCase):
     def test_should_receive_user_left_notification(self):
         self.client.force_login(self.user)
         token = self.client.access_token.token
-        from chat.tests.factories import RoomRoleFactory
         other_role = RoomRoleFactory(chat_room=self.chat_room)
         other_client = ApiTestClient(self.app)
         other_client.force_login(other_role.user)

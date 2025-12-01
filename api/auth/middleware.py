@@ -1,16 +1,16 @@
 from utils.request import Request
 from starlette.types import ASGIApp, Receive, Scope, Send
+from auth.authorization import oauth2_scheme, authenticate_token, CredentialValidationException
 
 
-class SessionUserMiddleware:
+class HTTPSessionUserMiddleware:
     def __init__(self, app: ASGIApp, *args, **kwargs):
         self.app = app
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send):
-        if scope['type'] != 'http':
+        if scope['type'] == 'websocket':
             await self.app(scope, receive, send)
             return
-        from auth.authorization import oauth2_scheme, authenticate_token, CredentialValidationException
         request = Request(scope, receive=receive, send=send)
         token = await oauth2_scheme(request)
         try:

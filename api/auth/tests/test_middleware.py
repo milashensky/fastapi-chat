@@ -6,7 +6,7 @@ from freezegun import freeze_time
 
 from auth.authorization import generate_user_access_token
 from auth.tests.factories import UserFactory
-from auth.middleware import SessionUserMiddleware
+from auth.middleware import HTTPSessionUserMiddleware
 from utils.request import Request
 
 
@@ -14,7 +14,7 @@ class SessionMiddlewareTestCase(IsolatedAsyncioTestCase):
     def setUp(self):
         self.user = UserFactory()
         app = FastAPI()
-        app.add_middleware(SessionUserMiddleware)
+        app.add_middleware(HTTPSessionUserMiddleware)
 
         @app.get('/')
         def test_view(request: Request):

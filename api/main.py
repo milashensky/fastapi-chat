@@ -3,9 +3,10 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from auth.middleware import SessionUserMiddleware
+from auth.middleware import HTTPSessionUserMiddleware
 from auth.router import auth_router
 from chat.api import chat_router
+from websocket.api import websocket_router
 from conf import settings
 from utils.serialization import serialize_errors
 from utils.exceptions import ValidationError
@@ -14,7 +15,7 @@ app = FastAPI(
     debug=settings.debug,
 )
 
-app.add_middleware(SessionUserMiddleware)
+app.add_middleware(HTTPSessionUserMiddleware)
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(
@@ -41,3 +42,4 @@ async def validation_error_handler(
 
 app.include_router(auth_router, prefix='/api/auth')
 app.include_router(chat_router, prefix='/api/chat')
+app.include_router(websocket_router, prefix='/api/websocket')

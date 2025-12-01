@@ -20,10 +20,11 @@ class ConnectionManager:
         self.active_connections[user_id].append(websocket)
 
     def disconnect(self, websocket: WebSocket, user_id: int):
-        if user_id in self.active_connections:
-            self.active_connections[user_id].remove(websocket)
-            if not self.active_connections[user_id]:
-                del self.active_connections[user_id]
+        if user_id not in self.active_connections:
+            return
+        self.active_connections[user_id].remove(websocket)
+        if not self.active_connections[user_id]:
+            del self.active_connections[user_id]
 
     async def send_to_user(self, user_id: int, message: dict):
         if user_id not in self.active_connections:
