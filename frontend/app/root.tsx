@@ -11,6 +11,7 @@ import {
 import { setupRequest } from '~/utils/request'
 import { useAuthStore } from '~/auth/auth-store'
 import { TOKEN_REFRESH_THRESHOLD_MS } from '~/utils/constants'
+import { useWebsocket } from '~/websocket/use-websocket'
 import type { Route } from './+types/root'
 import '~/globals/styles/main.css'
 
@@ -87,6 +88,7 @@ export default function App() {
             clearTimeout(timerId.current)
         }
     }, [accessToken])
+    useWebsocket()
     return <Outlet />
 }
 

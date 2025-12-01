@@ -15,6 +15,16 @@ interface Props {
     message: ChatMessage
 }
 
+export const getIsEdited = (message: ChatMessage) => {
+    if (!message.updated_at) {
+        return false
+    }
+    const createdDate = new Date(message.created_at)
+    const updatedDate = new Date(message.updated_at)
+    const diff = Math.abs(updatedDate.getTime() - createdDate.getTime())
+    return diff > 1000
+}
+
 const Message = (props: Props) => {
     const { message } = props
     const { setEditingMessageId } = useContext(chatRoomContext)
@@ -29,6 +39,7 @@ const Message = (props: Props) => {
     const startEditing = () => {
         setEditingMessageId(message.id)
     }
+    const isEdited = getIsEdited(message)
     return (
         <div
             className={classes}
@@ -43,7 +54,7 @@ const Message = (props: Props) => {
             <div className="message-footer">
                 <small className="message-time">
                     {formatTime(message.created_at)}
-                    {message.updated_at && ' (edited)'}
+                    {isEdited && ' (edited)'}
                 </small>
                 {
                     hasActions && (

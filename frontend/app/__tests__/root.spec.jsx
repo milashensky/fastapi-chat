@@ -5,6 +5,7 @@ import App from '../root'
 
 
 vi.mock('zustand')
+vi.mock('~/websocket/use-websocket')
 
 describeComponent('App', ({ render }) => {
     beforeEach(() => {

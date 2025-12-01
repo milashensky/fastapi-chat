@@ -7,7 +7,7 @@ import { RoomRoleEnum } from '~/chat/types'
 import { useAuthStore } from '~/auth/auth-store'
 import { useChatsStore } from '~/chat/chats-store'
 import { chatRoomContext } from '../../chat-room-context'
-import Message from '../message'
+import Message, { getIsEdited } from '../message'
 
 
 describeComponent('Message', ({ render }) => {
@@ -59,5 +59,37 @@ describeComponent('Message', ({ render }) => {
             const component = renderMessage(message, { userId: 10 })
             expect(component.queryByTestId('edit-message-button')).toBeFalsy()
         })
+    })
+})
+
+describe('getIsEdited', () => {
+    it.each([
+        {
+            created_at: '2025-12-12T12:30:00.000Z',
+            updated_at: null,
+            expected: false,
+        },
+        {
+            created_at: '2025-12-12T12:30:00.000Z',
+            updated_at: '2025-12-12T12:30:00.90Z',
+            expected: false,
+        },
+        {
+            created_at: '2025-12-12T12:30:00.000Z',
+            updated_at: '2025-12-12T12:30:05.000Z',
+            expected: true,
+        },
+    ])('should return $expected for created $created_at and updated $updated_at', (context) => {
+        const {
+            created_at,
+            updated_at,
+            expected,
+        } = context
+        const message = textMessageFactory({
+            created_at,
+            updated_at,
+        })
+        const result = getIsEdited(message)
+        expect(result).toBe(expected)
     })
 })

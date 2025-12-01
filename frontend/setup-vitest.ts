@@ -1,13 +1,17 @@
 import '@testing-library/jest-dom'
 import { cleanup } from '@testing-library/react'
 import { vi, afterEach } from 'vitest'
+import { MockWebSocket } from '~/websocket/__mocks__/websocket'
 
+
+vi.stubGlobal('WebSocket', MockWebSocket)
 
 afterEach(() => {
     cleanup()
     vi.clearAllMocks()
     vi.restoreAllMocks()
     vi.unstubAllEnvs()
+    MockWebSocket.reset()
 })
 
 // Mock window.matchMedia for required components
