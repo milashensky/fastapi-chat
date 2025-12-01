@@ -3,7 +3,7 @@ import datetime
 from typing import Annotated, List
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, WebSocket
 from sqlmodel import desc, select
 
 from auth.authorization import get_current_user
@@ -28,6 +28,7 @@ from chat.schemas import (
     PublicMessage,
     RoomRoleUpdateBody,
 )
+from chat.websocket import manager, WebSocketEventType
 from conf import settings
 from db import SessionDep
 from utils.pagination import paginate_response, pagination_dep
@@ -222,6 +223,12 @@ async def accept_invite_api(
     db_session.add(enter_message)
     db_session.commit()
     db_session.refresh(chat_room)
+    db_session.refresh(enter_message)
+    await manager.broadcast_to_room(
+        room=chat_room,
+        event_type=WebSocketEventType.MESSAGE_CREATED,
+        content=PublicMessage.model_validate(enter_message).model_dump(mode='json'),
+    )
     return chat_room
 
 
@@ -240,6 +247,11 @@ async def create_message_api(
     db_session.add(message)
     db_session.commit()
     db_session.refresh(message)
+    await manager.broadcast_to_room(
+        room=room,
+        event_type=WebSocketEventType.MESSAGE_CREATED,
+        content=PublicMessage.model_validate(message).model_dump(mode='json'),
+    )
     return message
 
 
@@ -286,7 +298,13 @@ async def update_message_api(
     ).first()
     if not message:
         raise HTTPException(404, 'Not Found')
-    return patch_model(message, data, db_session)
+    updated_message = patch_model(message, data, db_session)
+    await manager.broadcast_to_room(
+        room=message.chat_room,
+        event_type=WebSocketEventType.MESSAGE_UPDATED,
+        content=PublicMessage.model_validate(updated_message).model_dump(mode='json'),
+    )
+    return updated_message
 
 
 @chat_router.delete('/message/{message_id}', name='chat:delete_message_api', response_model=None, status_code=204)
@@ -315,8 +333,15 @@ async def delete_message_api(
         ).first()
         if not chat_role:
             raise HTTPException(404, 'Not Found')
+    chat_room = message.chat_room
+    deleted_message_id = message.id
     db_session.delete(message)
     db_session.commit()
+    await manager.broadcast_to_room(
+        room=chat_room,
+        event_type=WebSocketEventType.MESSAGE_DELETED,
+        content={'id': deleted_message_id},
+    )
     return None
 
 
@@ -378,13 +403,41 @@ async def delete_room_role_api(
         and (role_pair.current_user_role.role not in [RoomRoleEnum.ADMIN, RoomRoleEnum.MODERATOR])
     ):
         raise HTTPException(403, 'Not enough permissions to perform the action')
+    chat_room = role_pair.room_role.chat_room
     db_session.delete(role_pair.room_role)
     exit_message = Message(
-        chat_room_id=role_pair.room_role.chat_room_id,
+        chat_room_id=chat_room.id,
         created_by_id=current_user.id,
         type=MessageTypeEnum.SYSTEM_ANNOUNCEMENT,
         content=f'User {role_pair.room_role.user.name} left the chat.',
     )
     db_session.add(exit_message)
     db_session.commit()
+    db_session.refresh(exit_message)
+    await manager.broadcast_to_room(
+        room=chat_room,
+        event_type=WebSocketEventType.MESSAGE_CREATED,
+        content=PublicMessage.model_validate(exit_message).model_dump(mode='json'),
+    )
     return None
+
+
+@chat_router.websocket('/ws', name='chat:websocket')
+async def websocket_endpoint(websocket: WebSocket, token: str | None = None):
+    from auth.authorization import authenticate_token, CredentialValidationException
+    from chat.websocket import manager
+    from starlette.websockets import WebSocketDisconnect
+    if not token:
+        await websocket.close(code=4003)
+        return
+    try:
+        user = await authenticate_token(token)
+    except CredentialValidationException:
+        await websocket.close(code=4003)
+        return
+    await manager.connect(websocket, user.id)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        manager.disconnect(websocket, user.id)
